@@ -4,6 +4,7 @@ const morgan = require('morgan');
 const { connectDB } = require('./config/db');
 require('dotenv').config();
 const cookieParser = require('cookie-parser');
+const { setupSwagger } = require('./config/swagger');
 // Import routes
 const userRoutes = require('./routes/userRoutes');
 
@@ -26,6 +27,9 @@ app.get('/', (req, res) => {
   res.send('EagleEye Backend is running...');
 });
 
+// Setup Swagger documentation
+setupSwagger(app);
+
 // Start server
 async function startServer() {
   try {
@@ -44,4 +48,9 @@ process.on('unhandledRejection', (err) => {
   process.exit(1);
 });
 
-startServer();
+// Only start server if this file is run directly, not when imported for testing
+if (require.main === module) {
+  startServer();
+}
+
+module.exports = app;

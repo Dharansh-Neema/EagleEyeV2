@@ -3,10 +3,14 @@ require('dotenv').config();
 
 // Connection URL
 const url = process.env.MONGODB_URI || 'mongodb://localhost:27017';
-const dbName = 'EagleEye';
+const dbName = process.env.NODE_ENV === 'test' ? 'EagleEyeTest' : 'EagleEye';
 
 let db = null;
 let client = null;
+
+// For testing purposes
+let testDb = null;
+let testClient = null;
 
 
 async function connectDB() {
@@ -30,6 +34,11 @@ async function connectDB() {
 }
 
 function getDB() {
+  // If in test mode and test db is available, return it
+  if (process.env.NODE_ENV === 'test' && testDb) {
+    return testDb;
+  }
+  
   if (!db) {
     throw new Error('Database not initialized. Call connectDB first.');
   }
@@ -43,8 +52,15 @@ async function closeDB() {
   }
 }
 
+// For testing purposes only
+function setTestDB(testConnection, testDatabase) {
+  testClient = testConnection;
+  testDb = testDatabase;
+}
+
 module.exports = {
   connectDB,
   getDB,
-  closeDB
+  closeDB,
+  setTestDB // Export for testing
 };

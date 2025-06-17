@@ -186,7 +186,7 @@ const updateUserProfile = async (req, res) => {
 const updateUserPassword = async(req,res)=>{
   try {
     const db = getDB();
-    const user = await userModel.findUserById(db, req.user.id);
+    const user = await userModel.findUserById(db, req.user._id);
     console.log('User:',user)
     
     if (!user) {
@@ -196,7 +196,7 @@ const updateUserPassword = async(req,res)=>{
       });
     }
     
-    const updatedUser = await userModel.updatePassword(db, req.user.id, req.body.password);
+    const updatedUser = await userModel.updatePassword(db, req.user._id, req.body.password);
     console.log('Updated User:',updatedUser)
     
     res.status(200).json({
