@@ -8,10 +8,7 @@ const dbName = 'EagleEye';
 let db = null;
 let client = null;
 
-/**
- * Connect to MongoDB
- * @returns {Promise<Object>} MongoDB client and database instance
- */
+
 async function connectDB() {
   try {
     if (db && client) {
@@ -23,6 +20,8 @@ async function connectDB() {
     console.log('Connected successfully to MongoDB server');
     
     db = client.db(dbName);
+
+    console.log('Database connection established');
     return { db, client };
   } catch (error) {
     console.error('MongoDB connection error:', error);
@@ -30,10 +29,6 @@ async function connectDB() {
   }
 }
 
-/**
- * Get database instance
- * @returns {Object} MongoDB database instance
- */
 function getDB() {
   if (!db) {
     throw new Error('Database not initialized. Call connectDB first.');
@@ -41,9 +36,6 @@ function getDB() {
   return db;
 }
 
-/**
- * Close database connection
- */
 async function closeDB() {
   if (client) {
     await client.close();
