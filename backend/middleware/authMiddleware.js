@@ -6,16 +6,8 @@ const { AppError } = require('./errorMiddleware');
 
 const isLoggedIn = async (req, res, next) => {
   try {
-    let token;
     
-    // Check for token in headers or cookies
-    if (req.body.token || req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
-      // Get token from header
-      token = req.body.token || req.headers.authorization.split(' ')[1];
-    } else if (req.cookies && req.cookies.token) {
-      // Get token from cookie
-      token = req.cookies.token;
-    }
+    const token = req.cookies.token || req.body.token || req.headers.authorization.split(' ')[1];
     
     // Check if token exists
     if (!token) {
@@ -31,9 +23,10 @@ const isLoggedIn = async (req, res, next) => {
     
     // Get user from token
     const db = getDB();
+    console.log(decoded.id)
     const user = await db.collection('users').findOne(
       { _id: new ObjectId(decoded.id) },
-      { projection: { password: 0 } } // Exclude password from result
+      { projection: { password: 0 } }
     );
     
     if (!user) {
@@ -55,6 +48,7 @@ const isLoggedIn = async (req, res, next) => {
     
     // Grant access to protected route
     req.user = user;
+    console.log(req.user)
     next();
   } catch (error) {
     next(new AppError('Authentication error', 500));

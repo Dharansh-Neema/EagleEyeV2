@@ -63,7 +63,6 @@ function validateUser(userData) {
 
 async function createUser(db, userData) {
   console.log("Creating user:", userData);
-  userData.role = userData.role || 'user';
   
   const validation = validateUser(userData);
   if (!validation.isValid) throw new Error(`Validation failed: ${JSON.stringify(validation.errors)}`);

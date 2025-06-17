@@ -5,6 +5,7 @@ const {
   getCurrentUser,
   updateUserProfile,
   updateUserPassword,
+  logoutUser,
   getUsers
 } = require('../controllers/userController');
 const { isLoggedIn, admin } = require('../middleware/authMiddleware');
@@ -19,7 +20,7 @@ router.post('/login', loginUser);
 router.get('/me', isLoggedIn, getCurrentUser);
 router.put('/update-profile', isLoggedIn, updateUserProfile);
 router.put('/update-password', isLoggedIn, updateUserPassword);
-
+router.post('/logout', isLoggedIn, logoutUser);
 // Admin routes
 router.get('/', isLoggedIn, admin, getUsers);
 
