@@ -1,0 +1,299 @@
+{
+	"info": {
+		"_postman_id": "f9a7c4d8-3e5b-4f12-b6a9-d8e7f2c45678",
+		"name": "EagleEyeV2 Organizations",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"description": "API collection for EagleEye V2 Organization endpoints"
+	},
+	"item": [
+		{
+			"name": "Organizations",
+			"item": [
+				{
+					"name": "Create Organization (Admin Only)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Test Organization\",\n    \"description\": \"This is a test organization\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/organizations",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"organizations"
+							]
+						},
+						"description": "Create a new organization (admin only)"
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Organizations (Admin Only)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/organizations/all",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"organizations",
+								"all"
+							]
+						},
+						"description": "Get all organizations (admin only)"
+					},
+					"response": []
+				},
+				{
+					"name": "Get User Organizations",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/organizations",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"organizations"
+							]
+						},
+						"description": "Get organizations for the current user"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Organization Details",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"organizationId\": \"60d21b4667d0d8992e610c85\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/organizations/details",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"organizations",
+								"details"
+							]
+						},
+						"description": "Get details of a specific organization"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Organization (Admin Only)",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"organizationId\": \"60d21b4667d0d8992e610c85\",\n    \"name\": \"Updated Organization Name\",\n    \"description\": \"Updated organization description\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/organizations",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"organizations"
+							]
+						},
+						"description": "Update an organization (admin only)"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Organization (Admin Only)",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"organizationId\": \"60d21b4667d0d8992e610c85\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/organizations",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"organizations"
+							]
+						},
+						"description": "Delete an organization (admin only)"
+					},
+					"response": []
+				},
+				{
+					"name": "Add Member to Organization (Admin Only)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"organizationId\": \"60d21b4667d0d8992e610c85\",\n    \"userId\": \"60d21b4667d0d8992e610c86\",\n    \"role\": \"user\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/organizations/members",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"organizations",
+								"members"
+							]
+						},
+						"description": "Add a member to an organization (admin only)"
+					},
+					"response": []
+				},
+				{
+					"name": "Remove Member from Organization (Admin Only)",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"organizationId\": \"60d21b4667d0d8992e610c85\",\n    \"userId\": \"60d21b4667d0d8992e610c86\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/organizations/members",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"organizations",
+								"members"
+							]
+						},
+						"description": "Remove a member from an organization (admin only)"
+					},
+					"response": []
+				}
+			],
+			"description": "Organization management endpoints"
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"// Auto-extract token from login response",
+					"if (pm.response.code === 200 || pm.response.code === 201) {",
+					"    const jsonData = pm.response.json();",
+					"    if (jsonData && jsonData.data && jsonData.data.token) {",
+					"        pm.environment.set('token', jsonData.data.token);",
+					"        console.log('Token saved to environment');",
+					"    }",
+					"}"
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:5000",
+			"type": "string"
+		},
+		{
+			"key": "token",
+			"value": "",
+			"type": "string"
+		}
+	]
+}

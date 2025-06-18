@@ -1,0 +1,250 @@
+{
+  "info": {
+   "_postman_id": "e8a5b3f7-4c2c-4b8a-9d5e-f9e3e0d7c123",
+    "name": "EagleEyeV2 Combined",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Combined API collection for EagleEye V2 application (User & Organization endpoints)"
+  },
+  "item": [
+    {
+      "name": "User",
+      "item": [
+        {
+          "name": "Register User",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n    \"name\": \"John Doe\",\n    \"email\": \"john@example.com\",\n    \"password\": \"password123\"\n}" },
+            "url": { "raw": "{{base_url}}/api/users/signin", "host": ["{{base_url}}"], "path": ["api","users","signin"] },
+            "description": "Register a new user"
+          },
+          "response": []
+        },
+        {
+          "name": "Login User",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n    \"email\": \"john@example.com\",\n    \"password\": \"password123\"\n}" },
+            "url": { "raw": "{{base_url}}/api/users/login", "host": ["{{base_url}}"], "path": ["api","users","login"] },
+            "description": "Login with existing user credentials"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Current User",
+          "request": {
+            "method": "GET",
+            "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
+            "url": { "raw": "{{base_url}}/api/users/me", "host": ["{{base_url}}"], "path": ["api","users","me"] },
+            "description": "Get current user profile"
+          },
+          "response": []
+        },
+        {
+          "name": "Update User Profile",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n    \"name\": \"John Updated\",\n    \"email\": \"john.updated@example.com\"\n}" },
+            "url": { "raw": "{{base_url}}/api/users/update-profile", "host": ["{{base_url}}"], "path": ["api","users","update-profile"] },
+            "description": "Update user profile information"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Password",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n    \"currentPassword\": \"password123\",\n    \"password\": \"newpassword123\"\n}" },
+            "url": { "raw": "{{base_url}}/api/users/update-password", "host": ["{{base_url}}"], "path": ["api","users","update-password"] },
+            "description": "Update user password"
+          },
+          "response": []
+        },
+        {
+          "name": "Logout User",
+          "request": {
+            "method": "GET",
+            "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
+            "url": { "raw": "{{base_url}}/api/users/logout", "host": ["{{base_url}}"], "path": ["api","users","logout"] },
+            "description": "Logout user and clear cookie"
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Users (Admin Only)",
+          "request": {
+            "method": "GET",
+            "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
+            "url": { "raw": "{{base_url}}/api/users", "host": ["{{base_url}}"], "path": ["api","users"] },
+            "description": "Get all users (admin only)"
+          },
+          "response": []
+        },
+        {
+          "name": "Register Admin User",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": { "mode": "raw", "raw": "{\n    \"name\": \"Admin User\",\n    \"email\": \"admin@example.com\",\n    \"password\": \"admin123\",\n    \"role\": \"admin\"\n}" },
+            "url": { "raw": "{{base_url}}/api/users/signin", "host": ["{{base_url}}"], "path": ["api","users","signin"] },
+            "description": "Register a new admin user"
+          },
+          "response": []
+        }
+      ],
+      "description": "User management endpoints"
+    },
+    {
+      "name": "Organizations",
+      "item": [
+        {
+          "name": "Create Organization (Admin Only)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n    \"name\": \"Test Organization\",\n    \"description\": \"This is a test organization\"\n}" },
+            "url": { "raw": "{{base_url}}/api/organizations", "host": ["{{base_url}}"], "path": ["api","organizations"] },
+            "description": "Create a new organization (admin only)"
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Organizations (Admin Only)",
+          "request": {
+            "method": "GET",
+            "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
+            "url": { "raw": "{{base_url}}/api/organizations/all", "host": ["{{base_url}}"], "path": ["api","organizations","all"] },
+            "description": "Get all organizations (admin only)"
+          },
+          "response": []
+        },
+        {
+          "name": "Get User Organizations",
+          "request": {
+            "method": "GET",
+            "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
+            "url": { "raw": "{{base_url}}/api/organizations", "host": ["{{base_url}}"], "path": ["api","organizations"] },
+            "description": "Get organizations for the current user"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Organization Details",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n    \"organizationId\": \"60d21b4667d0d8992e610c85\"\n}" },
+            "url": { "raw": "{{base_url}}/api/organizations/details", "host": ["{{base_url}}"], "path": ["api","organizations","details"] },
+            "description": "Get details of a specific organization"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Organization (Admin Only)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n    \"organizationId\": \"60d21b4667d0d8992e610c85\",\n    \"name\": \"Updated Organization Name\",\n    \"description\": \"Updated organization description\"\n}" },
+            "url": { "raw": "{{base_url}}/api/organizations", "host": ["{{base_url}}"], "path": ["api","organizations"] },
+            "description": "Update an organization (admin only)"
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Organization (Admin Only)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n    \"organizationId\": \"60d21b4667d0d8992e610c85\"\n}" },
+            "url": { "raw": "{{base_url}}/api/organizations", "host": ["{{base_url}}"], "path": ["api","organizations"] },
+            "description": "Delete an organization (admin only)"
+          },
+          "response": []
+        },
+        {
+          "name": "Add Member to Organization (Admin Only)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n    \"organizationId\": \"60d21b4667d0d8992e610c85\",\n    \"userId\": \"60d21b4667d0d8992e610c86\",\n    \"role\": \"user\"\n}" },
+            "url": { "raw": "{{base_url}}/api/organizations/members", "host": ["{{base_url}}"], "path": ["api","organizations","members"] },
+            "description": "Add a member to an organization (admin only)"
+          },
+          "response": []
+        },
+        {
+          "name": "Remove Member from Organization (Admin Only)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n    \"organizationId\": \"60d21b4667d0d8992e610c85\",\n    \"userId\": \"60d21b4667d0d8992e610c86\"\n}" },
+            "url": { "raw": "{{base_url}}/api/organizations/members", "host": ["{{base_url}}"], "path": ["api","organizations","members"] },
+            "description": "Remove a member from an organization (admin only)"
+          },
+          "response": []
+        }
+      ],
+      "description": "Organization management endpoints"
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [ "" ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Auto-extract token from login response",
+          "if (pm.response.code === 200 || pm.response.code === 201) {",
+          "    const jsonData = pm.response.json();",
+          "    if (jsonData && jsonData.data && jsonData.data.token) {",
+          "        pm.environment.set('token', jsonData.data.token);",
+          "        console.log('Token saved to environment');",
+          "    }",
+          "}"
+        ]
+      }
+    }
+  ],
+  "variable": [
+    { "key": "base_url", "value": "http://localhost:5000", "type": "string" },
+    { "key": "token", "value": "", "type": "string" }
+  ]
+}
