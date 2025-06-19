@@ -216,6 +216,170 @@
         }
       ],
       "description": "Organization management endpoints"
+    },
+    {
+      "name": "Projects",
+      "item": [
+        {
+          "name": "Create Project (Admin Only)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n    \"name\": \"Demo Project\",\n    \"description\": \"Project created via Postman\",\n    \"organizationId\": \"60d21b4667d0d8992e610c85\"\n}" },
+            "url": { "raw": "{{base_url}}/api/projects", "host": ["{{base_url}}"], "path": ["api","projects"] },
+            "description": "Create a project under an organization"
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Projects (Admin Only)",
+          "request": {
+            "method": "GET",
+            "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
+            "url": { "raw": "{{base_url}}/api/projects/all", "host": ["{{base_url}}"], "path": ["api","projects","all"] },
+            "description": "Retrieve all projects"
+          },
+          "response": []
+        },
+        {
+          "name": "Get User Projects",
+          "request": {
+            "method": "GET",
+            "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
+            "url": { "raw": "{{base_url}}/api/projects", "host": ["{{base_url}}"], "path": ["api","projects"] },
+            "description": "Retrieve projects for current user"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Project Details",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n    \"projectId\": \"60d21b4667d0d8992e610c90\"\n}" },
+            "url": { "raw": "{{base_url}}/api/projects/details", "host": ["{{base_url}}"], "path": ["api","projects","details"] },
+            "description": "Get details of a project"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Project (Admin Only)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n    \"projectId\": \"60d21b4667d0d8992e610c90\",\n    \"name\": \"Updated Project Name\",\n    \"description\": \"Updated description\"\n}" },
+            "url": { "raw": "{{base_url}}/api/projects", "host": ["{{base_url}}"], "path": ["api","projects"] },
+            "description": "Update a project"
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Project (Admin Only)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n    \"projectId\": \"60d21b4667d0d8992e610c90\"\n}" },
+            "url": { "raw": "{{base_url}}/api/projects", "host": ["{{base_url}}"], "path": ["api","projects"] },
+            "description": "Delete a project"
+          },
+          "response": []
+        }
+      ],
+      "description": "Project management endpoints"
+    },
+    {
+      "name": "Observations",
+      "item": [
+        {
+          "name": "Create Observation (Admin Only)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n    \"name\": \"Temperature Reading\",\n    \"projectId\": \"60d21b4667d0d8992e610c90\",\n    \"data_type\": \"number\",\n    \"value\": 36.6\n}" },
+            "url": { "raw": "{{base_url}}/api/observations", "host": ["{{base_url}}"], "path": ["api","observations"] },
+            "description": "Create an observation value"
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Observations (Admin Only)",
+          "request": {
+            "method": "GET",
+            "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
+            "url": { "raw": "{{base_url}}/api/observations/all", "host": ["{{base_url}}"], "path": ["api","observations","all"] },
+            "description": "Retrieve all observations"
+          },
+          "response": []
+        },
+        {
+          "name": "Get User Observations",
+          "request": {
+            "method": "GET",
+            "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
+            "url": { "raw": "{{base_url}}/api/observations", "host": ["{{base_url}}"], "path": ["api","observations"] },
+            "description": "Retrieve observations for current user"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Observation Details",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n    \"observationId\": \"60d21b4667d0d8992e610ca0\"\n}" },
+            "url": { "raw": "{{base_url}}/api/observations/details", "host": ["{{base_url}}"], "path": ["api","observations","details"] },
+            "description": "Get observation details"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Observation (Admin Only)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n    \"observationId\": \"60d21b4667d0d8992e610ca0\",\n    \"value\": 37.2\n}" },
+            "url": { "raw": "{{base_url}}/api/observations", "host": ["{{base_url}}"], "path": ["api","observations"] },
+            "description": "Update an observation"
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Observation (Admin Only)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n    \"observationId\": \"60d21b4667d0d8992e610ca0\"\n}" },
+            "url": { "raw": "{{base_url}}/api/observations", "host": ["{{base_url}}"], "path": ["api","observations"] },
+            "description": "Delete an observation"
+          },
+          "response": []
+        }
+      ],
+      "description": "Observation management endpoints"
     }
   ],
   "event": [
