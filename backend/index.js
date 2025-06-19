@@ -8,6 +8,8 @@ const { setupSwagger } = require('./config/swagger');
 // Import routes
 const userRoutes = require('./routes/userRoutes');
 const organizationRoutes = require('./routes/organizationRoutes');
+const projectRoutes = require('./routes/projectRoutes');
+const observationRoutes = require('./routes/observationRoutes');
 
 // Initialize express app
 const app = express();
@@ -23,6 +25,8 @@ app.use(cookieParser());
 // Routes
 app.use('/api/users', userRoutes);
 app.use('/api/organizations', organizationRoutes);
+app.use('/api/projects', projectRoutes);
+app.use('/api/observations', observationRoutes);
 
 // Root route
 app.get('/', (req, res) => {
