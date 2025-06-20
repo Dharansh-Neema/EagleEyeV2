@@ -10,6 +10,8 @@ const userRoutes = require('./routes/userRoutes');
 const organizationRoutes = require('./routes/organizationRoutes');
 const projectRoutes = require('./routes/projectRoutes');
 const observationRoutes = require('./routes/observationRoutes');
+const inspectionStationRoutes = require('./routes/inspectionStationRoutes');
+const cameraRoutes = require('./routes/cameraRoutes');
 
 // Initialize express app
 const app = express();
@@ -27,6 +29,8 @@ app.use('/api/users', userRoutes);
 app.use('/api/organizations', organizationRoutes);
 app.use('/api/projects', projectRoutes);
 app.use('/api/observations', observationRoutes);
+app.use('/api/inspection-stations', inspectionStationRoutes);
+app.use('/api/cameras', cameraRoutes);
 
 // Root route
 app.get('/', (req, res) => {

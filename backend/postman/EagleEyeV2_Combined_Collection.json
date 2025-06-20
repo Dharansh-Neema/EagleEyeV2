@@ -380,6 +380,170 @@
         }
       ],
       "description": "Observation management endpoints"
+    },
+    {
+      "name": "Inspection Stations",
+      "item": [
+        {
+          "name": "Create Inspection Station (Admin Only)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n    \"name\": \"Main Station\",\n    \"description\": \"Primary quality check station\",\n    \"projectId\": \"60d21b4667d0d8992e610c90\"\n}" },
+            "url": { "raw": "{{base_url}}/api/inspection-stations", "host": ["{{base_url}}"], "path": ["api","inspection-stations"] },
+            "description": "Create an inspection station under a project"
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Inspection Stations (Admin Only)",
+          "request": {
+            "method": "GET",
+            "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
+            "url": { "raw": "{{base_url}}/api/inspection-stations/all", "host": ["{{base_url}}"], "path": ["api","inspection-stations","all"] },
+            "description": "Retrieve all inspection stations"
+          },
+          "response": []
+        },
+        {
+          "name": "Get User Inspection Stations",
+          "request": {
+            "method": "GET",
+            "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
+            "url": { "raw": "{{base_url}}/api/inspection-stations", "host": ["{{base_url}}"], "path": ["api","inspection-stations"] },
+            "description": "Retrieve inspection stations for current user"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Inspection Station Details",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n    \"stationId\": \"60d21b4667d0d8992e610cb0\"\n}" },
+            "url": { "raw": "{{base_url}}/api/inspection-stations/details", "host": ["{{base_url}}"], "path": ["api","inspection-stations","details"] },
+            "description": "Get details of an inspection station"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Inspection Station (Admin Only)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n    \"stationId\": \"60d21b4667d0d8992e610cb0\",\n    \"description\": \"Updated description\"\n}" },
+            "url": { "raw": "{{base_url}}/api/inspection-stations", "host": ["{{base_url}}"], "path": ["api","inspection-stations"] },
+            "description": "Update an inspection station"
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Inspection Station (Admin Only)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n    \"stationId\": \"60d21b4667d0d8992e610cb0\"\n}" },
+            "url": { "raw": "{{base_url}}/api/inspection-stations", "host": ["{{base_url}}"], "path": ["api","inspection-stations"] },
+            "description": "Delete an inspection station"
+          },
+          "response": []
+        }
+      ],
+      "description": "Inspection station management endpoints"
+    },
+    {
+      "name": "Cameras",
+      "item": [
+        {
+          "name": "Create Camera (Admin Only)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n    \"name\": \"Cam-1\",\n    \"inspectionStationId\": \"60d21b4667d0d8992e610cb0\"\n}" },
+            "url": { "raw": "{{base_url}}/api/cameras", "host": ["{{base_url}}"], "path": ["api","cameras"] },
+            "description": "Create a camera under an inspection station"
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Cameras (Admin Only)",
+          "request": {
+            "method": "GET",
+            "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
+            "url": { "raw": "{{base_url}}/api/cameras/all", "host": ["{{base_url}}"], "path": ["api","cameras","all"] },
+            "description": "Retrieve all cameras"
+          },
+          "response": []
+        },
+        {
+          "name": "Get User Cameras",
+          "request": {
+            "method": "GET",
+            "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
+            "url": { "raw": "{{base_url}}/api/cameras", "host": ["{{base_url}}"], "path": ["api","cameras"] },
+            "description": "Retrieve cameras for current user"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Camera Details",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n    \"cameraId\": \"60d21b4667d0d8992e610cc0\"\n}" },
+            "url": { "raw": "{{base_url}}/api/cameras/details", "host": ["{{base_url}}"], "path": ["api","cameras","details"] },
+            "description": "Get camera details"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Camera (Admin Only)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n    \"cameraId\": \"60d21b4667d0d8992e610cc0\",\n    \"name\": \"Cam-1 Updated\"\n}" },
+            "url": { "raw": "{{base_url}}/api/cameras", "host": ["{{base_url}}"], "path": ["api","cameras"] },
+            "description": "Update a camera"
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Camera (Admin Only)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n    \"cameraId\": \"60d21b4667d0d8992e610cc0\"\n}" },
+            "url": { "raw": "{{base_url}}/api/cameras", "host": ["{{base_url}}"], "path": ["api","cameras"] },
+            "description": "Delete a camera"
+          },
+          "response": []
+        }
+      ],
+      "description": "Camera management endpoints"
     }
   ],
   "event": [
