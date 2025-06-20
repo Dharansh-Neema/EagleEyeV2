@@ -20,7 +20,9 @@ const cameraSchema = {
   inspection_station_id: { type: ObjectId, required: true },
   inspection_station_name: { type: String, required: true },
   project_id: { type: ObjectId, required: true },
+  project_name: { type: String, required: true },
   organization_id: { type: ObjectId, required: true },
+  organization_name: { type: String, required: true },
   created_by: { type: Object, required: true },
   created_at: { type: Date, default: () => new Date() },
   updated_at: { type: Date, default: () => new Date() }
@@ -84,7 +86,9 @@ async function updateCamera(db, id, updateData) {
   updateData.updated_at = new Date();
 
   delete updateData.organization_id;
+  delete updateData.organization_name;
   delete updateData.project_id;
+  delete updateData.project_name;
   delete updateData.inspection_station_id;
   delete updateData.inspection_station_name;
   delete updateData.created_by;
