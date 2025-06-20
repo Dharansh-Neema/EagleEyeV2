@@ -20,7 +20,9 @@ const createCamera = async (req, res) => {
       inspection_station_id: new ObjectId(inspectionStationId),
       inspection_station_name: station.name,
       project_id: station.project_id,
+      project_name: station.project_name,
       organization_id: station.organization_id,
+      organization_name: station.organization_name,
       created_by: { user_id: new ObjectId(req.user._id), name: req.user.name }
     };
 
