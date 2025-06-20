@@ -4,7 +4,6 @@ const path = require('path');
 const fs = require('fs');
 const { getDB } = require('../config/db');
 const cameraModel = require('../models/cameraModel');
-const stationModel = require('../models/inspectionStationModel');
 const imageModel = require('../models/imageModel');
 const organizationModel = require('../models/organizationModel');
 

@@ -544,6 +544,83 @@
         }
       ],
       "description": "Camera management endpoints"
+    },
+    {
+      "name": "Images",
+      "item": [
+        {
+          "name": "Upload Image (Admin Only)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "cameraId", "value": "60d21b4667d0d8992e610cc0", "type": "text" },
+                { "key": "image", "type": "file", "src": "<path-to-image.jpg>" }
+              ]
+            },
+            "url": { "raw": "{{base_url}}/api/images/upload", "host": ["{{base_url}}"], "path": ["api","images","upload"] },
+            "description": "Upload an image under camera"
+          },
+          "response": []
+        },
+        {
+          "name": "Get User Images",
+          "request": {
+            "method": "GET",
+            "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
+            "url": { "raw": "{{base_url}}/api/images", "host": ["{{base_url}}"], "path": ["api","images"] },
+            "description": "Retrieve images for current user"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Image Details",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n    \"imageId\": \"60d21b4667d0d8992e610cd0\"\n}" },
+            "url": { "raw": "{{base_url}}/api/images/details", "host": ["{{base_url}}"], "path": ["api","images","details"] },
+            "description": "Get image metadata"
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Image (Admin Only)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n    \"imageId\": \"60d21b4667d0d8992e610cd0\"\n}" },
+            "url": { "raw": "{{base_url}}/api/images", "host": ["{{base_url}}"], "path": ["api","images"] },
+            "description": "Delete an image"
+          },
+          "response": []
+        },
+        {
+          "name": "Count Images - Organization",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n    \"organizationId\": \"60d21b4667d0d8992e610c85\"\n}" },
+            "url": { "raw": "{{base_url}}/api/images/count/organization", "host": ["{{base_url}}"], "path": ["api","images","count","organization"] },
+            "description": "Count images at organization level"
+          },
+          "response": []
+        }
+      ],
+      "description": "Image management and analytics endpoints"
     }
   ],
   "event": [

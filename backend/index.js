@@ -12,6 +12,7 @@ const projectRoutes = require('./routes/projectRoutes');
 const observationRoutes = require('./routes/observationRoutes');
 const inspectionStationRoutes = require('./routes/inspectionStationRoutes');
 const cameraRoutes = require('./routes/cameraRoutes');
+const imageRoutes = require('./routes/imageRoutes');
 
 // Initialize express app
 const app = express();
@@ -22,6 +23,10 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(morgan('dev'));
+
+// Serve uploaded images
+const path = require('path');
+app.use('/storage', express.static(path.join(__dirname, '../storage')));
 app.use(cookieParser());
 
 // Routes
@@ -31,6 +36,7 @@ app.use('/api/projects', projectRoutes);
 app.use('/api/observations', observationRoutes);
 app.use('/api/inspection-stations', inspectionStationRoutes);
 app.use('/api/cameras', cameraRoutes);
+app.use('/api/images', imageRoutes);
 
 // Root route
 app.get('/', (req, res) => {
