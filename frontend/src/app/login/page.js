@@ -74,21 +74,6 @@ const LoginBox = styled(Paper)(({ theme }) => ({
   },
 }));
 
-const QualitasFooter = styled(Box)(({ theme }) => ({
-  position: "fixed",
-  left: 0,
-  right: 0,
-  bottom: 0,
-  textAlign: "center",
-  color: theme.palette.grey[500],
-  fontWeight: 500,
-  fontSize: 18,
-  letterSpacing: 2,
-  padding: theme.spacing(2, 0),
-  zIndex: 10,
-  background: "rgba(255,255,255,0.7)",
-}));
-
 export default function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");

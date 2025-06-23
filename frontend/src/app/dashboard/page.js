@@ -21,6 +21,7 @@ import {
   Toolbar,
   IconButton,
   useMediaQuery,
+  Link as MuiLink,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
@@ -62,18 +63,30 @@ const CenterBox = styled(Box)(({ theme }) => ({
   display: "flex",
   flexDirection: "column",
   alignItems: "center",
-  justifyContent: "center",
+  justifyContent: "flex-start",
   minHeight: "calc(100vh - 120px)",
-  paddingTop: theme.spacing(6),
+  paddingTop: theme.spacing(3),
   paddingBottom: theme.spacing(8),
   background: "linear-gradient(135deg, #f4f6f8 60%, #e3eefd 100%)",
+  width: "100%",
+}));
+
+const FullWidthTableContainer = styled(TableContainer)(({ theme }) => ({
+  width: "100%",
+  maxWidth: "100vw",
+  [theme.breakpoints.down("sm")]: {
+    maxWidth: "100vw",
+    overflowX: "auto",
+  },
 }));
 
 export default function DashboardPage() {
   const router = useRouter();
   const [user, setUser] = useState(null);
   const [organizations, setOrganizations] = useState([]);
+  const [imageCounts, setImageCounts] = useState({});
   const [loading, setLoading] = useState(true);
+  const [countsLoading, setCountsLoading] = useState(true);
   const [error, setError] = useState("");
   const [anchorEl, setAnchorEl] = useState(null);
   const isMobile = useMediaQuery("(max-width:900px)");
@@ -106,6 +119,37 @@ export default function DashboardPage() {
     // eslint-disable-next-line
   }, []);
 
+  useEffect(() => {
+    const fetchImageCounts = async () => {
+      if (!organizations.length) return;
+      setCountsLoading(true);
+      try {
+        const counts = await Promise.all(
+          organizations.map(async (org) => {
+            try {
+              const res = await axios.post(
+                "/api/images/count/organization",
+                { organizationId: org._id },
+                { withCredentials: true }
+              );
+              return { id: org._id, count: res.data.count ?? 0 };
+            } catch {
+              return { id: org._id, count: 0 };
+            }
+          })
+        );
+        const countsMap = {};
+        counts.forEach(({ id, count }) => {
+          countsMap[id] = count;
+        });
+        setImageCounts(countsMap);
+      } finally {
+        setCountsLoading(false);
+      }
+    };
+    fetchImageCounts();
+  }, [organizations]);
+
   const handleAvatarClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
@@ -130,9 +174,9 @@ export default function DashboardPage() {
             <Image
               src="/logo/Eagle_Eye_logo_white.png"
               alt="Eagle Eye Logo"
-              width={isMobile ? 40 : 56}
-              height={isMobile ? 40 : 56}
-              style={{ marginRight: 16 }}
+              width={isMobile ? 80 : 120}
+              height={isMobile ? 80 : 120}
+              style={{ marginRight: 24 }}
               priority
             />
           </LogoBox>
@@ -160,7 +204,9 @@ export default function DashboardPage() {
           </Box>
         </Toolbar>
       </StyledAppBar>
-      <CenterBox>
+      <CenterBox
+        sx={{ width: "100%", flex: 1, p: 0, m: 0, alignItems: "stretch" }}
+      >
         {error && (
           <Alert severity="error" sx={{ mb: 2 }}>
             {error}
@@ -169,35 +215,34 @@ export default function DashboardPage() {
         <Paper
           elevation={3}
           sx={{
-            width: isMobile ? "100%" : 600,
-            p: 3,
+            width: "100%",
+            maxWidth: "100vw",
+            p: 0,
             borderRadius: 4,
             boxShadow: "0 4px 24px rgba(10,35,66,0.10)",
             background: "#fff",
+            overflow: "auto",
+            mt: 0,
           }}
         >
-          <Typography
-            variant="h5"
-            fontWeight={700}
-            color={DARK_BLUE}
-            mb={2}
-            align="center"
-          >
-            Organizations
-          </Typography>
-          <TableContainer>
-            <Table>
+          <FullWidthTableContainer>
+            <Table stickyHeader>
               <TableHead>
                 <TableRow>
                   <TableCell
-                    sx={{ fontWeight: 700, color: ACCENT_BLUE, fontSize: 16 }}
+                    sx={{ fontWeight: 700, color: ACCENT_BLUE, fontSize: 18 }}
                   >
                     Name
                   </TableCell>
                   <TableCell
-                    sx={{ fontWeight: 700, color: ACCENT_BLUE, fontSize: 16 }}
+                    sx={{ fontWeight: 700, color: ACCENT_BLUE, fontSize: 18 }}
                   >
                     Description
+                  </TableCell>
+                  <TableCell
+                    sx={{ fontWeight: 700, color: ACCENT_BLUE, fontSize: 18 }}
+                  >
+                    Image Count
                   </TableCell>
                 </TableRow>
               </TableHead>
@@ -205,24 +250,35 @@ export default function DashboardPage() {
                 {organizations.map((org) => (
                   <TableRow key={org._id} hover>
                     <TableCell>
-                      <Typography
+                      <MuiLink
                         sx={{
                           color: DARK_BLUE,
                           fontWeight: 600,
                           cursor: "pointer",
                           textDecoration: "underline",
+                          fontSize: 17,
                         }}
                         onClick={() => router.push("/project")}
+                        underline="none"
                       >
                         {org.name}
-                      </Typography>
+                      </MuiLink>
                     </TableCell>
-                    <TableCell>{org.description || "No description"}</TableCell>
+                    <TableCell sx={{ fontSize: 16 }}>
+                      {org.description || "No description"}
+                    </TableCell>
+                    <TableCell sx={{ fontSize: 16 }}>
+                      {countsLoading ? (
+                        <CircularProgress size={18} />
+                      ) : (
+                        imageCounts[org._id] ?? 0
+                      )}
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
             </Table>
-          </TableContainer>
+          </FullWidthTableContainer>
         </Paper>
       </CenterBox>
       <CopyrightFooter>&copy; Qualitas 2025</CopyrightFooter>
