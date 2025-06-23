@@ -22,9 +22,11 @@ import {
   IconButton,
   useMediaQuery,
   Link as MuiLink,
+  Button,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import LogoutIcon from "@mui/icons-material/Logout";
 
 const DARK_BLUE = "#0a2342";
 const ACCENT_BLUE = "#1976d2";
@@ -158,6 +160,13 @@ export default function DashboardPage() {
   };
   const open = Boolean(anchorEl);
 
+  const handleLogout = async () => {
+    try {
+      await axios.get("/api/users/logout", { withCredentials: true });
+    } catch {}
+    router.push("/login");
+  };
+
   if (loading) {
     return (
       <CenterBox>
@@ -200,6 +209,28 @@ export default function DashboardPage() {
               <Typography variant="body2" color="text.secondary">
                 {user?.email}
               </Typography>
+              <Button
+                variant="outlined"
+                color="error"
+                startIcon={
+                  <Image
+                    src="/log-out.svg"
+                    alt="Logout"
+                    width={20}
+                    height={20}
+                  />
+                }
+                sx={{
+                  mt: 2,
+                  fontWeight: 600,
+                  textTransform: "none",
+                  borderRadius: 2,
+                }}
+                onClick={handleLogout}
+                fullWidth
+              >
+                Logout
+              </Button>
             </Popover>
           </Box>
         </Toolbar>
