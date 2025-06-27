@@ -7,12 +7,6 @@ import {
   Box,
   Typography,
   Paper,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
   Avatar,
   Popover,
   CircularProgress,
@@ -21,12 +15,15 @@ import {
   Toolbar,
   IconButton,
   useMediaQuery,
-  Link as MuiLink,
-  Button,
+  Grid,
+  Card,
+  CardContent,
+  CardActionArea,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import LogoutIcon from "@mui/icons-material/Logout";
+import { Button } from "@mui/material";
 
 const DARK_BLUE = "#0a2342";
 const ACCENT_BLUE = "#1976d2";
@@ -73,22 +70,75 @@ const CenterBox = styled(Box)(({ theme }) => ({
   width: "100%",
 }));
 
-const FullWidthTableContainer = styled(TableContainer)(({ theme }) => ({
-  width: "100%",
-  maxWidth: "100vw",
-  [theme.breakpoints.down("sm")]: {
-    maxWidth: "100vw",
-    overflowX: "auto",
+const OrganizationCard = styled(Card)(({ theme }) => ({
+  height: 200,
+  background: "linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%)",
+  borderRadius: 16,
+  boxShadow: "0 4px 20px rgba(10,35,66,0.08)",
+  border: "1px solid rgba(10,35,66,0.05)",
+  transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+  cursor: "pointer",
+  position: "relative",
+  overflow: "hidden",
+
+  "&::before": {
+    content: '""',
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    height: "4px",
+    background: `linear-gradient(90deg, ${DARK_BLUE}, ${ACCENT_BLUE})`,
+    transform: "scaleX(0)",
+    transition: "transform 0.3s ease",
   },
+
+  "&:hover": {
+    transform: "translateY(-8px) scale(1.02)",
+    boxShadow: "0 12px 40px rgba(10,35,66,0.15)",
+    borderColor: ACCENT_BLUE,
+
+    "&::before": {
+      transform: "scaleX(1)",
+    },
+
+    "& .organization-name": {
+      color: ACCENT_BLUE,
+      transform: "translateX(8px)",
+    },
+
+    "& .organization-description": {
+      opacity: 1,
+      transform: "translateY(0)",
+    },
+  },
+}));
+
+const OrganizationName = styled(Typography)(({ theme }) => ({
+  fontSize: "1.5rem",
+  fontWeight: 700,
+  color: DARK_BLUE,
+  marginBottom: theme.spacing(1),
+  transition: "all 0.3s ease",
+  display: "flex",
+  alignItems: "center",
+  gap: theme.spacing(1),
+}));
+
+const OrganizationDescription = styled(Typography)(({ theme }) => ({
+  color: theme.palette.text.secondary,
+  fontSize: "1rem",
+  lineHeight: 1.6,
+  opacity: 0.8,
+  transform: "translateY(4px)",
+  transition: "all 0.3s ease",
 }));
 
 export default function DashboardPage() {
   const router = useRouter();
   const [user, setUser] = useState(null);
   const [organizations, setOrganizations] = useState([]);
-  const [imageCounts, setImageCounts] = useState({});
   const [loading, setLoading] = useState(true);
-  const [countsLoading, setCountsLoading] = useState(true);
   const [error, setError] = useState("");
   const [anchorEl, setAnchorEl] = useState(null);
   const isMobile = useMediaQuery("(max-width:900px)");
@@ -121,37 +171,6 @@ export default function DashboardPage() {
     // eslint-disable-next-line
   }, []);
 
-  useEffect(() => {
-    const fetchImageCounts = async () => {
-      if (!organizations.length) return;
-      setCountsLoading(true);
-      try {
-        const counts = await Promise.all(
-          organizations.map(async (org) => {
-            try {
-              const res = await axios.post(
-                "/api/images/count/organization",
-                { organizationId: org._id },
-                { withCredentials: true }
-              );
-              return { id: org._id, count: res.data.count ?? 0 };
-            } catch {
-              return { id: org._id, count: 0 };
-            }
-          })
-        );
-        const countsMap = {};
-        counts.forEach(({ id, count }) => {
-          countsMap[id] = count;
-        });
-        setImageCounts(countsMap);
-      } finally {
-        setCountsLoading(false);
-      }
-    };
-    fetchImageCounts();
-  }, [organizations]);
-
   const handleAvatarClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
@@ -165,6 +184,10 @@ export default function DashboardPage() {
       await axios.get("/api/users/logout", { withCredentials: true });
     } catch {}
     router.push("/login");
+  };
+
+  const handleOrganizationClick = (orgId) => {
+    router.push("/organization-dashboard");
   };
 
   if (loading) {
@@ -243,74 +266,45 @@ export default function DashboardPage() {
             {error}
           </Alert>
         )}
-        <Paper
-          elevation={3}
-          sx={{
-            width: "100%",
-            maxWidth: "100vw",
-            p: 0,
-            borderRadius: 4,
-            boxShadow: "0 4px 24px rgba(10,35,66,0.10)",
-            background: "#fff",
-            overflow: "auto",
-            mt: 0,
-          }}
-        >
-          <FullWidthTableContainer>
-            <Table stickyHeader>
-              <TableHead>
-                <TableRow>
-                  <TableCell
-                    sx={{ fontWeight: 700, color: ACCENT_BLUE, fontSize: 18 }}
-                  >
-                    Name
-                  </TableCell>
-                  <TableCell
-                    sx={{ fontWeight: 700, color: ACCENT_BLUE, fontSize: 18 }}
-                  >
-                    Description
-                  </TableCell>
-                  <TableCell
-                    sx={{ fontWeight: 700, color: ACCENT_BLUE, fontSize: 18 }}
-                  >
-                    Image Count
-                  </TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {organizations.map((org) => (
-                  <TableRow key={org._id} hover>
-                    <TableCell>
-                      <MuiLink
-                        sx={{
-                          color: DARK_BLUE,
-                          fontWeight: 600,
-                          cursor: "pointer",
-                          textDecoration: "underline",
-                          fontSize: 17,
-                        }}
-                        onClick={() => router.push("/project")}
-                        underline="none"
-                      >
+        <Box sx={{ p: 3, width: "100%", maxWidth: "1200px", mx: "auto" }}>
+          <Typography
+            variant="h4"
+            fontWeight={700}
+            color={DARK_BLUE}
+            mb={4}
+            align="center"
+          >
+            Organizations
+          </Typography>
+          <Grid container spacing={3}>
+            {organizations.map((org) => (
+              <Grid item xs={12} sm={6} md={4} key={org._id}>
+                <OrganizationCard
+                  onClick={() => handleOrganizationClick(org._id)}
+                >
+                  <CardActionArea sx={{ height: "100%", p: 0 }}>
+                    <CardContent
+                      sx={{
+                        p: 3,
+                        height: "100%",
+                        display: "flex",
+                        flexDirection: "column",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <OrganizationName className="organization-name">
                         {org.name}
-                      </MuiLink>
-                    </TableCell>
-                    <TableCell sx={{ fontSize: 16 }}>
-                      {org.description || "No description"}
-                    </TableCell>
-                    <TableCell sx={{ fontSize: 16 }}>
-                      {countsLoading ? (
-                        <CircularProgress size={18} />
-                      ) : (
-                        imageCounts[org._id] ?? 0
-                      )}
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </FullWidthTableContainer>
-        </Paper>
+                      </OrganizationName>
+                      <OrganizationDescription className="organization-description">
+                        {org.description || "No description available"}
+                      </OrganizationDescription>
+                    </CardContent>
+                  </CardActionArea>
+                </OrganizationCard>
+              </Grid>
+            ))}
+          </Grid>
+        </Box>
       </CenterBox>
       <CopyrightFooter>&copy; Qualitas 2025</CopyrightFooter>
     </Box>
