@@ -347,9 +347,9 @@ export default function OrganizationDashboard() {
 
   const handleQuickAction = (action) => {
     const project = getSelectedProject();
-    const orgId = sessionStorage.getItem("selectedOrganizationId");
     if (project) {
-      router.push(`/${action}?projectId=${project._id}`);
+      sessionStorage.setItem("selectedProjectId", project._id);
+      router.push(`/${action}`);
     } else {
       router.push(`/${action}`);
     }
@@ -357,9 +357,9 @@ export default function OrganizationDashboard() {
 
   const handleNavigation = (nav) => {
     const project = getSelectedProject();
-    const orgId = sessionStorage.getItem("selectedOrganizationId");
     if (project) {
-      router.push(`/${nav}?projectId=${project._id}`);
+      sessionStorage.setItem("selectedProjectId", project._id);
+      router.push(`/${nav}`);
     } else {
       router.push(`/${nav}`);
     }
