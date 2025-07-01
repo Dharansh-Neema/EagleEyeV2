@@ -187,6 +187,7 @@ export default function DashboardPage() {
   };
 
   const handleOrganizationClick = (orgId) => {
+    sessionStorage.setItem("selectedOrganizationId", orgId);
     router.push("/organization-dashboard");
   };
 

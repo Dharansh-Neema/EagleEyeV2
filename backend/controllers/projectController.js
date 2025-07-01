@@ -204,7 +204,7 @@ const getProjectByOrganizationId = async (req, res) => {
     return res
       .status(200)
       .json({ success: true, count: projects.length, data: projects });
-  } catch {
+  } catch (error) {
     console.error("getProjectByOrganizationId error:", error);
     return res.status(500).json({ success: false, message: "Server error" });
   }
