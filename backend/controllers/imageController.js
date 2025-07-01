@@ -1,13 +1,13 @@
-const { ObjectId } = require('mongodb');
-const multer = require('multer');
-const path = require('path');
-const fs = require('fs');
-const { getDB } = require('../config/db');
-const cameraModel = require('../models/cameraModel');
-const imageModel = require('../models/imageModel');
-const organizationModel = require('../models/organizationModel');
+const { ObjectId } = require("mongodb");
+const multer = require("multer");
+const path = require("path");
+const fs = require("fs");
+const { getDB } = require("../config/db");
+const cameraModel = require("../models/cameraModel");
+const imageModel = require("../models/imageModel");
+const organizationModel = require("../models/organizationModel");
 
-const STORAGE_ROOT = path.join(__dirname, '../../storage');
+const STORAGE_ROOT = path.join(__dirname, "../../storage");
 
 // Ensure a directory exists
 function ensureDir(p) {
@@ -19,18 +19,29 @@ async function prefetchCamera(req, res, next) {
   try {
     const { cameraId } = req.query;
     console.log(cameraId);
-    if (!cameraId) return res.status(400).json({ success: false, message: 'cameraId required' });
+    if (!cameraId)
+      return res
+        .status(400)
+        .json({ success: false, message: "cameraId required" });
 
     const db = getDB();
     const camera = await cameraModel.findCameraById(db, cameraId);
-    if (!camera) return res.status(404).json({ success: false, message: 'Camera not found' });
+    if (!camera)
+      return res
+        .status(404)
+        .json({ success: false, message: "Camera not found" });
 
     // Authorization for non-admin
-    if (req.user.role !== 'admin') {
-      const orgs = await organizationModel.findOrganizationsByUserId(db, req.user._id);
+    if (req.user.role !== "admin") {
+      const orgs = await organizationModel.findOrganizationsByUserId(
+        db,
+        req.user._id
+      );
       const orgIds = orgs.map((o) => o._id.toString());
       if (!orgIds.includes(camera.organization_id.toString())) {
-        return res.status(403).json({ success: false, message: 'Not authorized' });
+        return res
+          .status(403)
+          .json({ success: false, message: "Not authorized" });
       }
     }
 
@@ -39,11 +50,13 @@ async function prefetchCamera(req, res, next) {
     const folders = [
       camera.organization_id.toString(),
       camera.project_id.toString(),
-      camera.inspection_station_id?.toString() || camera.inspection_station?.id?.toString() || '',
+      camera.inspection_station_id?.toString() ||
+        camera.inspection_station?.id?.toString() ||
+        "",
       camera._id.toString(),
       now.getFullYear().toString(),
-      (now.getMonth() + 1).toString().padStart(2, '0'),
-      now.getDate().toString().padStart(2, '0')
+      (now.getMonth() + 1).toString().padStart(2, "0"),
+      now.getDate().toString().padStart(2, "0"),
     ];
     const destPath = path.join(STORAGE_ROOT, ...folders);
     ensureDir(destPath);
@@ -52,8 +65,8 @@ async function prefetchCamera(req, res, next) {
     req._imageDestPath = destPath;
     next();
   } catch (err) {
-    console.error('prefetchCamera error:', err);
-    return res.status(500).json({ success: false, message: 'Server error' });
+    console.error("prefetchCamera error:", err);
+    return res.status(500).json({ success: false, message: "Server error" });
   }
 }
 
@@ -65,63 +78,87 @@ const storage = multer.diskStorage({
   filename: (req, file, cb) => {
     const uniqueName = `${Date.now()}_${file.originalname}`;
     cb(null, uniqueName);
-  }
+  },
 });
 
 const upload = multer({ storage });
 
 // ========== Controller Functions ==========
 
-// Admin-only upload
+// Admin-only upload (multi-image)
 const uploadImage = [
-    prefetchCamera,
-  upload.single('image'),
+  prefetchCamera,
+  upload.array("image", 20), // allow up to 20 images per upload
 
   async (req, res) => {
     try {
-      if (!req.file) return res.status(400).json({ success: false, message: 'No file uploaded' });
+      if (!req.files || req.files.length === 0) {
+        return res
+          .status(400)
+          .json({ success: false, message: "No files uploaded" });
+      }
 
       const db = getDB();
       const cam = req._camera;
-      const relPath = path.relative(STORAGE_ROOT, req.file.path);
-    
-      const imageDoc = {
-        filename: req.file.filename,
-        organization: { id: cam.organization_id, name: cam.organization_name || '' },
-        project: { id: cam.project_id, name: cam.project_name || '' },
-        inspection_station: { id: cam.inspection_station_id, name: cam.inspection_station_name || '' },
-        camera: { id: cam._id, name: cam.name },
-        full_path: relPath
-      };
+      const savedImages = [];
 
-      const saved = await imageModel.createImage(db, imageDoc);
-      return res.status(201).json({ success: true, data: saved });
+      for (const file of req.files) {
+        const relPath = path.relative(STORAGE_ROOT, file.path);
+        const imageDoc = {
+          filename: file.filename,
+          organization: {
+            id: cam.organization_id,
+            name: cam.organization_name || "",
+          },
+          project: { id: cam.project_id, name: cam.project_name || "" },
+          inspection_station: {
+            id: cam.inspection_station_id,
+            name: cam.inspection_station_name || "",
+          },
+          camera: { id: cam._id, name: cam.name },
+          full_path: relPath,
+        };
+        const saved = await imageModel.createImage(db, imageDoc);
+        savedImages.push(saved);
+      }
+
+      return res
+        .status(201)
+        .json({ success: true, count: savedImages.length, data: savedImages });
     } catch (err) {
-      console.error('uploadImage error:', err);
-      return res.status(500).json({ success: false, message: err.message || 'Server error' });
+      console.error("uploadImage error:", err);
+      return res
+        .status(500)
+        .json({ success: false, message: err.message || "Server error" });
     }
-  }
+  },
 ];
 
 // Admin-only delete
 const deleteImage = async (req, res) => {
   try {
     const { imageId } = req.body;
-    if (!imageId) return res.status(400).json({ success: false, message: 'imageId required' });
+    if (!imageId)
+      return res
+        .status(400)
+        .json({ success: false, message: "imageId required" });
 
     const db = getDB();
     const img = await imageModel.findImageById(db, imageId);
-    if (!img) return res.status(404).json({ success: false, message: 'Image not found' });
+    if (!img)
+      return res
+        .status(404)
+        .json({ success: false, message: "Image not found" });
 
     // Delete file from disk
     const absPath = path.join(STORAGE_ROOT, img.full_path);
     if (fs.existsSync(absPath)) fs.unlinkSync(absPath);
 
     await imageModel.deleteImage(db, imageId);
-    return res.status(200).json({ success: true, message: 'Image deleted' });
+    return res.status(200).json({ success: true, message: "Image deleted" });
   } catch (err) {
-    console.error('deleteImage error:', err);
-    return res.status(500).json({ success: false, message: 'Server error' });
+    console.error("deleteImage error:", err);
+    return res.status(500).json({ success: false, message: "Server error" });
   }
 };
 
@@ -129,22 +166,34 @@ const deleteImage = async (req, res) => {
 const getImageById = async (req, res) => {
   try {
     const { imageId } = req.body;
-    if (!imageId) return res.status(400).json({ success: false, message: 'imageId required' });
+    if (!imageId)
+      return res
+        .status(400)
+        .json({ success: false, message: "imageId required" });
 
     const db = getDB();
     const img = await imageModel.findImageById(db, imageId);
-    if (!img) return res.status(404).json({ success: false, message: 'Image not found' });
+    if (!img)
+      return res
+        .status(404)
+        .json({ success: false, message: "Image not found" });
 
-    if (req.user.role !== 'admin') {
-      const orgs = await organizationModel.findOrganizationsByUserId(db, req.user._id);
+    if (req.user.role !== "admin") {
+      const orgs = await organizationModel.findOrganizationsByUserId(
+        db,
+        req.user._id
+      );
       const ids = orgs.map((o) => o._id.toString());
-      if (!ids.includes(img.organization.id.toString())) return res.status(403).json({ success: false, message: 'Not authorized' });
+      if (!ids.includes(img.organization.id.toString()))
+        return res
+          .status(403)
+          .json({ success: false, message: "Not authorized" });
     }
 
     return res.status(200).json({ success: true, data: img });
   } catch (err) {
-    console.error('getImageById error:', err);
-    return res.status(500).json({ success: false, message: 'Server error' });
+    console.error("getImageById error:", err);
+    return res.status(500).json({ success: false, message: "Server error" });
   }
 };
 
@@ -152,45 +201,66 @@ const getImageById = async (req, res) => {
 const getImagesByCamera = async (req, res) => {
   try {
     const { cameraId } = req.body;
-    console.log(cameraId)
-    if (!cameraId) return res.status(400).json({ success: false, message: 'cameraId required' });
+    console.log(cameraId);
+    if (!cameraId)
+      return res
+        .status(400)
+        .json({ success: false, message: "cameraId required" });
 
     const db = getDB();
 
     // Verify camera exists
     const cam = await cameraModel.findCameraById(db, cameraId);
-    if (!cam) return res.status(404).json({ success: false, message: 'Camera not found' });
+    if (!cam)
+      return res
+        .status(404)
+        .json({ success: false, message: "Camera not found" });
 
     // Authorization
-    if (req.user.role !== 'admin') {
-      const orgs = await organizationModel.findOrganizationsByUserId(db, req.user._id);
+    if (req.user.role !== "admin") {
+      const orgs = await organizationModel.findOrganizationsByUserId(
+        db,
+        req.user._id
+      );
       const ids = orgs.map((o) => o._id.toString());
-      if (!ids.includes(cam.organization_id.toString())) return res.status(403).json({ success: false, message: 'Not authorized' });
+      if (!ids.includes(cam.organization_id.toString()))
+        return res
+          .status(403)
+          .json({ success: false, message: "Not authorized" });
     }
 
     const imgs = await imageModel.findImagesByCameraId(db, cameraId);
-    return res.status(200).json({ success: true, count: imgs.length, data: imgs });
+    return res
+      .status(200)
+      .json({ success: true, count: imgs.length, data: imgs });
   } catch (err) {
-    console.error('getImagesByCamera error:', err);
-    return res.status(500).json({ success: false, message: 'Server error' });
+    console.error("getImagesByCamera error:", err);
+    return res.status(500).json({ success: false, message: "Server error" });
   }
 };
 
 const getUserImages = async (req, res) => {
   try {
     const db = getDB();
-    if (req.user.role === 'admin') {
+    if (req.user.role === "admin") {
       const imgs = await imageModel.getAllImages(db);
-      return res.status(200).json({ success: true, count: imgs.length, data: imgs });
+      return res
+        .status(200)
+        .json({ success: true, count: imgs.length, data: imgs });
     }
 
-    const orgs = await organizationModel.findOrganizationsByUserId(db, req.user._id);
+    const orgs = await organizationModel.findOrganizationsByUserId(
+      db,
+      req.user._id
+    );
     const ids = orgs.map((o) => o._id);
     const imgs = await imageModel.findImagesForUser(db, ids);
-    return res.status(200).json({ success: true, count: imgs.length, data: imgs });
+    return res
+      .status(200)
+      .json({ success: true, count: imgs.length, data: imgs });
   } catch (err) {
-    console.error('getUserImages error:', err);
-    return res.status(500).json({ success: false, message: 'Server error' });
+    console.error("getUserImages error:", err);
+    return res.status(500).json({ success: false, message: "Server error" });
   }
 };
 
@@ -200,38 +270,53 @@ async function countHelper(req, res, level) {
     const db = getDB();
     let query = {};
     switch (level) {
-      case 'organization':
-        if (!req.body.organizationId) return res.status(400).json({ success: false, message: 'organizationId required' });
-        query = { 'organization.id': new ObjectId(req.body.organizationId) };
+      case "organization":
+        if (!req.body.organizationId)
+          return res
+            .status(400)
+            .json({ success: false, message: "organizationId required" });
+        query = { "organization.id": new ObjectId(req.body.organizationId) };
         break;
-      case 'project':
-        if (!req.body.projectId) return res.status(400).json({ success: false, message: 'projectId required' });
-        query = { 'project.id': new ObjectId(req.body.projectId) };
+      case "project":
+        if (!req.body.projectId)
+          return res
+            .status(400)
+            .json({ success: false, message: "projectId required" });
+        query = { "project.id": new ObjectId(req.body.projectId) };
         break;
-      case 'station':
-        if (!req.body.stationId) return res.status(400).json({ success: false, message: 'stationId required' });
-        query = { 'inspection_station.id': new ObjectId(req.body.stationId) };
+      case "station":
+        if (!req.body.stationId)
+          return res
+            .status(400)
+            .json({ success: false, message: "stationId required" });
+        query = { "inspection_station.id": new ObjectId(req.body.stationId) };
         break;
-      case 'camera':
-        if (!req.body.cameraId) return res.status(400).json({ success: false, message: 'cameraId required' });
-        query = { 'camera.id': new ObjectId(req.body.cameraId) };
+      case "camera":
+        if (!req.body.cameraId)
+          return res
+            .status(400)
+            .json({ success: false, message: "cameraId required" });
+        query = { "camera.id": new ObjectId(req.body.cameraId) };
         break;
       default:
-        return res.status(400).json({ success: false, message: 'Invalid level' });
+        return res
+          .status(400)
+          .json({ success: false, message: "Invalid level" });
     }
 
     const count = await imageModel.countImages(db, query);
     return res.status(200).json({ success: true, count });
   } catch (err) {
-    console.error('countHelper error:', err);
-    return res.status(500).json({ success: false, message: 'Server error' });
+    console.error("countHelper error:", err);
+    return res.status(500).json({ success: false, message: "Server error" });
   }
 }
 
-const countOrganizationImages = (req, res) => countHelper(req, res, 'organization');
-const countProjectImages = (req, res) => countHelper(req, res, 'project');
-const countStationImages = (req, res) => countHelper(req, res, 'station');
-const countCameraImages = (req, res) => countHelper(req, res, 'camera');
+const countOrganizationImages = (req, res) =>
+  countHelper(req, res, "organization");
+const countProjectImages = (req, res) => countHelper(req, res, "project");
+const countStationImages = (req, res) => countHelper(req, res, "station");
+const countCameraImages = (req, res) => countHelper(req, res, "camera");
 
 module.exports = {
   uploadImage,
@@ -242,5 +327,5 @@ module.exports = {
   countProjectImages,
   countStationImages,
   countCameraImages,
-  getImagesByCamera
+  getImagesByCamera,
 };
