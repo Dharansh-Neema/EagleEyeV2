@@ -6,6 +6,7 @@ const { getDB } = require("../config/db");
 const cameraModel = require("../models/cameraModel");
 const imageModel = require("../models/imageModel");
 const organizationModel = require("../models/organizationModel");
+const { error } = require("console");
 
 const STORAGE_ROOT = path.join(__dirname, "../../storage");
 
@@ -82,8 +83,6 @@ const storage = multer.diskStorage({
 });
 
 const upload = multer({ storage });
-
-// ========== Controller Functions ==========
 
 // Admin-only upload (multi-image)
 const uploadImage = [
@@ -239,6 +238,23 @@ const getImagesByCamera = async (req, res) => {
   }
 };
 
+const getImagesForAnnotation = async (req, res) => {
+  try {
+    const { cameraId } = req.body;
+    if (!cameraId)
+      return res
+        .status(400)
+        .json({ success: false, message: "cameraId required" });
+    const db = getDB();
+    const res = await imageModel.getImagesForAnnotation(db, cameraId);
+    return res.status(200).json({ success: true, data: res });
+  } catch (err) {
+    res
+      .status(500)
+      .json({ success: false, message: "Server error", error: err.message });
+  }
+};
+
 const getUserImages = async (req, res) => {
   try {
     const db = getDB();
@@ -264,7 +280,7 @@ const getUserImages = async (req, res) => {
   }
 };
 
-const uppdateGroundTruth = async (req, res) => {
+const updateGroundTruth = async (req, res) => {
   try {
     const { imageId, data } = req.body;
     if (!imageId)
@@ -343,5 +359,6 @@ module.exports = {
   countStationImages,
   countCameraImages,
   getImagesByCamera,
-  uppdateGroundTruth,
+  updateGroundTruth,
+  getImagesForAnnotation,
 };

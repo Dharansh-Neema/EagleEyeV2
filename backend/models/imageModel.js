@@ -105,6 +105,13 @@ async function updateInference(db, id, data) {
     .updateOne({ _id: new ObjectId(id) }, { $set: { inference: data } });
 }
 
+async function getImagesForAnnotation(db, cameraId) {
+  return await db.collection("images").find({
+    "camera.id": new ObjectId(cameraId),
+    ground_truth: { $exists: false },
+  });
+}
+
 module.exports = {
   createImage,
   findImageById,
@@ -113,4 +120,7 @@ module.exports = {
   findImagesByCameraId,
   deleteImage,
   countImages,
+  updateGroundTruth,
+  updateInference,
+  getImagesForAnnotation,
 };
