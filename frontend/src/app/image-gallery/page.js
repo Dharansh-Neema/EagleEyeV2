@@ -165,171 +165,169 @@ export default function ImageGallery() {
         <Typography variant="h4" fontWeight={700} mb={4} align="center">
           Image Gallery
         </Typography>
-        {/* Filters */}
-        <Grid container spacing={3} alignItems="center" mb={4}>
-          <Grid item xs={12} md={5} lg={4}>
-            <FormControl fullWidth disabled={loadingStations || !projectId}>
-              <InputLabel>Inspection Station</InputLabel>
-              <Select
-                value={selectedStation}
-                label="Inspection Station"
-                onChange={handleStationChange}
-                displayEmpty
-                renderValue={(selected) =>
-                  selected
-                    ? stations.find((s) => s._id === selected)?.name
-                    : "Select station"
-                }
-              >
-                <MenuItem value="" disabled>
-                  <em>Select station</em>
-                </MenuItem>
-                {stations.map((station) => (
-                  <MenuItem key={station._id} value={station._id}>
-                    <PlaceIcon
-                      fontSize="small"
-                      sx={{ mr: 1, color: "#1976d2" }}
-                    />
-                    {station.name}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </Grid>
-          <Grid item xs={12} md={5} lg={4}>
-            <FormControl
-              fullWidth
-              disabled={!selectedStation || loadingCameras}
+        <Grid container spacing={4} alignItems="flex-start">
+          {/* Left column: Filters */}
+          <Grid item xs={12} md={3}>
+            <Box
+              sx={{
+                bgcolor: "#fff",
+                p: 3,
+                borderRadius: 3,
+                boxShadow: 2,
+                mb: { xs: 3, md: 0 },
+                minWidth: 0,
+              }}
             >
-              <InputLabel>Camera</InputLabel>
-              <Select
-                value={selectedCamera}
-                label="Camera"
-                onChange={handleCameraChange}
-                displayEmpty
-                renderValue={(selected) =>
-                  selected
-                    ? cameras.find((c) => c._id === selected)?.name
-                    : "Select camera"
-                }
+              <Typography variant="h6" fontWeight={600} mb={2}>
+                Filters
+              </Typography>
+              <FormControl
+                fullWidth
+                disabled={loadingStations || !projectId}
+                sx={{ mb: 3 }}
               >
-                <MenuItem value="" disabled>
-                  <em>Select camera</em>
-                </MenuItem>
-                {cameras.map((cam) => (
-                  <MenuItem key={cam._id} value={cam._id}>
-                    <CameraAltIcon
-                      fontSize="small"
-                      sx={{ mr: 1, color: "#1976d2" }}
-                    />
-                    {cam.name}
+                <InputLabel>Inspection Station</InputLabel>
+                <Select
+                  value={selectedStation}
+                  label="Inspection Station"
+                  onChange={handleStationChange}
+                  displayEmpty
+                  renderValue={(selected) =>
+                    selected
+                      ? stations.find((s) => s._id === selected)?.name
+                      : "Select station"
+                  }
+                >
+                  <MenuItem value="" disabled>
+                    <em>Select station</em>
                   </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
+                  {stations.map((station) => (
+                    <MenuItem key={station._id} value={station._id}>
+                      <PlaceIcon
+                        fontSize="small"
+                        sx={{ mr: 1, color: "#1976d2" }}
+                      />
+                      {station.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+              <FormControl
+                fullWidth
+                disabled={!selectedStation || loadingCameras}
+              >
+                <InputLabel>Camera</InputLabel>
+                <Select
+                  value={selectedCamera}
+                  label="Camera"
+                  onChange={handleCameraChange}
+                  displayEmpty
+                  renderValue={(selected) =>
+                    selected
+                      ? cameras.find((c) => c._id === selected)?.name
+                      : "Select camera"
+                  }
+                >
+                  <MenuItem value="" disabled>
+                    <em>Select camera</em>
+                  </MenuItem>
+                  {cameras.map((cam) => (
+                    <MenuItem key={cam._id} value={cam._id}>
+                      <CameraAltIcon
+                        fontSize="small"
+                        sx={{ mr: 1, color: "#1976d2" }}
+                      />
+                      {cam.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Box>
+          </Grid>
+
+          {/* Right column: Gallery */}
+          <Grid item xs={12} md={9}>
+            {error && (
+              <Alert severity="error" sx={{ mb: 3 }}>
+                {error}
+              </Alert>
+            )}
+            {loadingStations || loadingCameras || loadingImages ? (
+              <Box sx={{ display: "flex", justifyContent: "center", py: 8 }}>
+                <CircularProgress size={48} />
+              </Box>
+            ) : null}
+            <Box sx={{ mt: 2 }}>
+              {images.length === 0 && selectedCamera && !loadingImages ? (
+                <Box
+                  sx={{ textAlign: "center", color: "text.secondary", py: 8 }}
+                >
+                  <ImageIcon sx={{ fontSize: 64, mb: 2 }} />
+                  <Typography variant="h6">
+                    No images found for this camera.
+                  </Typography>
+                </Box>
+              ) : (
+                <Grid container spacing={4}>
+                  {images.map((img) => (
+                    <Grid item xs={12} sm={6} md={4} lg={3} key={img._id}>
+                      <Card
+                        sx={{
+                          height: "100%",
+                          display: "flex",
+                          flexDirection: "column",
+                          borderRadius: 4,
+                          boxShadow: 3,
+                          transition: "box-shadow 0.2s",
+                          "&:hover": { boxShadow: 8 },
+                        }}
+                      >
+                        <CardHeader
+                          title={img.filename}
+                          subheader={new Date(img.created_at).toLocaleString()}
+                          titleTypographyProps={{
+                            fontSize: 16,
+                            fontWeight: 600,
+                            noWrap: true,
+                          }}
+                          subheaderTypographyProps={{
+                            fontSize: 13,
+                            color: "text.secondary",
+                          }}
+                          sx={{ pb: 1 }}
+                        />
+                        <CardContent
+                          sx={{
+                            flex: 1,
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            p: 2,
+                          }}
+                        >
+                          <Box
+                            component="img"
+                            src={getImageUrl(img.full_path)}
+                            alt={img.filename}
+                            sx={{
+                              width: "100%",
+                              maxHeight: 180,
+                              objectFit: "contain",
+                              borderRadius: 2,
+                              boxShadow: 1,
+                              background: "#f3f4f6",
+                            }}
+                            loading="lazy"
+                          />
+                        </CardContent>
+                      </Card>
+                    </Grid>
+                  ))}
+                </Grid>
+              )}
+            </Box>
           </Grid>
         </Grid>
-
-        {/* Loading/Error States */}
-        {error && (
-          <Alert severity="error" sx={{ mb: 3 }}>
-            {error}
-          </Alert>
-        )}
-        {loadingStations || loadingCameras || loadingImages ? (
-          <Box sx={{ display: "flex", justifyContent: "center", py: 8 }}>
-            <CircularProgress size={48} />
-          </Box>
-        ) : null}
-
-        {/* Gallery Grid */}
-        <Box sx={{ mt: 2 }}>
-          {images.length === 0 && selectedCamera && !loadingImages ? (
-            <Box sx={{ textAlign: "center", color: "text.secondary", py: 8 }}>
-              <ImageIcon sx={{ fontSize: 64, mb: 2 }} />
-              <Typography variant="h6">
-                No images found for this camera.
-              </Typography>
-            </Box>
-          ) : (
-            <Grid container spacing={4}>
-              {images.map((img) => (
-                <Grid item xs={12} sm={6} md={4} lg={3} key={img._id}>
-                  <Card
-                    sx={{
-                      height: "100%",
-                      display: "flex",
-                      flexDirection: "column",
-                      borderRadius: 4,
-                      boxShadow: 3,
-                      transition: "box-shadow 0.2s",
-                      "&:hover": { boxShadow: 8 },
-                    }}
-                  >
-                    <CardHeader
-                      title={img.filename}
-                      subheader={new Date(img.created_at).toLocaleString()}
-                      titleTypographyProps={{
-                        fontSize: 16,
-                        fontWeight: 600,
-                        noWrap: true,
-                      }}
-                      subheaderTypographyProps={{
-                        fontSize: 13,
-                        color: "text.secondary",
-                      }}
-                      sx={{ pb: 1 }}
-                    />
-                    <CardContent
-                      sx={{
-                        flex: 1,
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        p: 2,
-                      }}
-                    >
-                      <Box
-                        component="img"
-                        src={getImageUrl(img.full_path)}
-                        alt={img.filename}
-                        sx={{
-                          width: "100%",
-                          maxHeight: 180,
-                          objectFit: "contain",
-                          borderRadius: 2,
-                          boxShadow: 1,
-                          background: "#f3f4f6",
-                        }}
-                        loading="lazy"
-                      />
-                    </CardContent>
-                    {/* <CardActions
-                      sx={{ justifyContent: "space-between", px: 2, pb: 2 }}
-                    >
-                      <Tooltip title="View Full Image">
-                        <IconButton
-                          color="primary"
-                          onClick={() => handleView(img)}
-                        >
-                          <VisibilityIcon />
-                        </IconButton>
-                      </Tooltip>
-                      <Tooltip title="Download Image">
-                        <IconButton
-                          color="primary"
-                          onClick={() => handleDownload(img)}
-                        >
-                          <DownloadIcon />
-                        </IconButton>
-                      </Tooltip>
-                    </CardActions> */}
-                  </Card>
-                </Grid>
-              ))}
-            </Grid>
-          )}
-        </Box>
       </Box>
     </Box>
   );
