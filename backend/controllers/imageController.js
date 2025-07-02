@@ -264,6 +264,21 @@ const getUserImages = async (req, res) => {
   }
 };
 
+const uppdateGroundTruth = async (req, res) => {
+  try {
+    const { imageId, data } = req.body;
+    if (!imageId)
+      return res
+        .status(400)
+        .json({ success: false, message: "ImageId required" });
+    const db = getDB();
+    const res = await imageModel.updateGroundTruth(db, imageId, data);
+    return res.status(200).json({ success: true, data: res });
+  } catch (err) {
+    console.error("updateGroundTruth error:", err);
+    return res.status(500).json({ success: false, message: "Server error" });
+  }
+};
 // Count endpoints
 async function countHelper(req, res, level) {
   try {
@@ -328,4 +343,5 @@ module.exports = {
   countStationImages,
   countCameraImages,
   getImagesByCamera,
+  uppdateGroundTruth,
 };
