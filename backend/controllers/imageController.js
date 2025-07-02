@@ -88,7 +88,7 @@ const upload = multer({ storage });
 // Admin-only upload (multi-image)
 const uploadImage = [
   prefetchCamera,
-  upload.array("image", 20), // allow up to 20 images per upload
+  upload.array("image", 50),
 
   async (req, res) => {
     try {
