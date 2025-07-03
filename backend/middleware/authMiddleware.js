@@ -16,14 +16,14 @@ const isLoggedIn = async (req, res, next) => {
     
     // Verify token
     const decoded = verifyToken(token);
-    console.log(decoded)  
+    // console.log(decoded)  
     if (!decoded) {
       return next(new AppError('Token is invalid or has expired', 401));
     }
     
     // Get user from token
     const db = getDB();
-    console.log(decoded.id)
+    // console.log(decoded.id)
     const user = await db.collection('users').findOne(
       { _id: new ObjectId(decoded.id) },
       { projection: { password: 0 } }
@@ -48,7 +48,7 @@ const isLoggedIn = async (req, res, next) => {
     
     // Grant access to protected route
     req.user = user;
-    console.log(req.user)
+    // console.log(req.user)
     next();
   } catch (error) {
     next(new AppError('Authentication error', 500));

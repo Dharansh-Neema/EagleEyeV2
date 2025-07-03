@@ -87,7 +87,7 @@ const upload = multer({ storage });
 // Admin-only upload (multi-image)
 const uploadImage = [
   prefetchCamera,
-  upload.array("image", 50),
+  upload.array("image", 100000),
 
   async (req, res) => {
     try {
@@ -246,8 +246,8 @@ const getImagesForAnnotation = async (req, res) => {
         .status(400)
         .json({ success: false, message: "cameraId required" });
     const db = getDB();
-    const res = await imageModel.getImagesForAnnotation(db, cameraId);
-    return res.status(200).json({ success: true, data: res });
+    const result = await imageModel.getImagesForAnnotation(db, cameraId);
+    return res.status(200).json({ success: true, data: result });
   } catch (err) {
     res
       .status(500)
