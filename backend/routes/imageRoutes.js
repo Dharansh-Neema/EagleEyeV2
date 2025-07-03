@@ -11,6 +11,7 @@ const {
   countCameraImages,
   getImagesForAnnotation,
   updateGroundTruth,
+  uploadInferenceImage,
 } = require("../controllers/imageController");
 
 const { isLoggedIn, admin } = require("../middleware/authMiddleware");
@@ -18,7 +19,8 @@ const { isLoggedIn, admin } = require("../middleware/authMiddleware");
 const router = express.Router();
 
 // Admin uploads & deletes
-router.post("/upload/", isLoggedIn, admin, uploadImage);
+router.post("/upload", isLoggedIn, admin, uploadImage);
+router.post("/upload/inference", isLoggedIn, admin, uploadInferenceImage);
 router.delete("/", isLoggedIn, admin, deleteImage);
 
 // Read
