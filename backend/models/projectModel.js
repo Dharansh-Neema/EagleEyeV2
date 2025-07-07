@@ -40,6 +40,10 @@ const projectSchema = {
     type: String,
     required: true
   },
+  settings:{
+    type: Object,
+    default: {}
+  },
   created_by: {
     type: Object,
     required: true // { user_id, name }
