@@ -109,7 +109,7 @@ async function getImagesForAnnotation(db, cameraId) {
   return await db.collection("images").find({
     "camera.id": new ObjectId(cameraId),
     ground_truth: { $exists: false },
-  });
+  }).toArray();
 }
 
 module.exports = {
