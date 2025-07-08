@@ -7,7 +7,7 @@ const cameraModel = require("../models/cameraModel");
 const imageModel = require("../models/imageModel");
 const organizationModel = require("../models/organizationModel");
 const { error } = require("console");
-const ExifImage = require('exif').ExifImage;
+const ExifImage = require("exif").ExifImage;
 const STORAGE_ROOT = path.join(__dirname, "../../storage");
 
 // Ensure a directory exists
@@ -133,37 +133,45 @@ const uploadImage = [
   },
 ];
 
-const exifr = require('exifr');
+const exifr = require("exifr");
 
 const uploadInferenceImage = [
   prefetchCamera,
-  upload.array('image', 100000),
+  upload.array("image", 100000),
 
   async (req, res) => {
     try {
       if (!req.files?.length) {
-        return res.status(400).json({ success: false, message: 'No files uploaded' });
+        return res
+          .status(400)
+          .json({ success: false, message: "No files uploaded" });
       }
 
-      const db       = getDB();
-      const cam      = req._camera;
-      const saved    = [];
+      const db = getDB();
+      const cam = req._camera;
+      const saved = [];
 
       for (const file of req.files) {
         const relPath = path.relative(STORAGE_ROOT, file.path);
 
         let inference = {};
         try {
-          inference = await exifr.parse(file.path);   // ← EXIF in one line
+          inference = await exifr.parse(file.path); // ← EXIF in one line
         } catch (e) {
           console.warn(`EXIF parse failed for ${file.filename}:`, e.message);
         }
 
         const doc = {
           filename: file.filename,
-          organization: { id: cam.organization_id,  name: cam.organization_name || '' },
-          project:      { id: cam.project_id,       name: cam.project_name || '' },
-          inspection_station: { id: cam.inspection_station_id, name: cam.inspection_station_name || '' },
+          organization: {
+            id: cam.organization_id,
+            name: cam.organization_name || "",
+          },
+          project: { id: cam.project_id, name: cam.project_name || "" },
+          inspection_station: {
+            id: cam.inspection_station_id,
+            name: cam.inspection_station_name || "",
+          },
           camera: { id: cam._id, name: cam.name },
           inference,
           full_path: relPath,
@@ -172,10 +180,14 @@ const uploadInferenceImage = [
         saved.push(await imageModel.createImage(db, doc));
       }
 
-      return res.status(201).json({ success: true, count: saved.length, data: saved });
+      return res
+        .status(201)
+        .json({ success: true, count: saved.length, data: saved });
     } catch (err) {
-      console.error('uploadInferenceImage error:', err);
-      return res.status(500).json({ success: false, message: err.message || 'Server error' });
+      console.error("uploadInferenceImage error:", err);
+      return res
+        .status(500)
+        .json({ success: false, message: err.message || "Server error" });
     }
   },
 ];
@@ -334,8 +346,8 @@ const updateGroundTruth = async (req, res) => {
         .status(400)
         .json({ success: false, message: "ImageId required" });
     const db = getDB();
-    const res = await imageModel.updateGroundTruth(db, imageId, data);
-    return res.status(200).json({ success: true, data: res });
+    const result = await imageModel.updateGroundTruth(db, imageId, data);
+    return res.status(200).json({ success: true, data: result });
   } catch (err) {
     console.error("updateGroundTruth error:", err);
     return res.status(500).json({ success: false, message: "Server error" });
