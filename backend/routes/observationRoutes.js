@@ -1,25 +1,27 @@
-const express = require('express');
+const express = require("express");
 const {
   createObservation,
   updateObservation,
   deleteObservation,
   getAllObservations,
   getObservationById,
-  getUserObservations
-} = require('../controllers/observationController');
+  getUserObservations,
+  getObservationsByProjectId,
+} = require("../controllers/observationController");
 
-const { isLoggedIn, admin } = require('../middleware/authMiddleware');
+const { isLoggedIn, admin } = require("../middleware/authMiddleware");
 
 const router = express.Router();
 
 // Admin routes
-router.post('/', isLoggedIn, admin, createObservation);
-router.put('/', isLoggedIn, admin, updateObservation);
-router.delete('/', isLoggedIn, admin, deleteObservation);
-router.get('/all', isLoggedIn, admin, getAllObservations);
+router.post("/", isLoggedIn, admin, createObservation);
+router.put("/", isLoggedIn, admin, updateObservation);
+router.delete("/", isLoggedIn, admin, deleteObservation);
+router.get("/all", isLoggedIn, admin, getAllObservations);
+router.post("/project", isLoggedIn, getObservationsByProjectId);
 
 // Shared routes
-router.post('/details', isLoggedIn, getObservationById);
-router.get('/', isLoggedIn, getUserObservations);
+router.post("/details", isLoggedIn, getObservationById);
+router.get("/", isLoggedIn, getUserObservations);
 
 module.exports = router;
