@@ -13,6 +13,7 @@ const {
   updateGroundTruth,
   uploadInferenceImage,
   dashboardData,
+  imagesByProjectId,
 } = require("../controllers/imageController");
 
 const { isLoggedIn, admin } = require("../middleware/authMiddleware");
@@ -28,6 +29,7 @@ router.delete("/", isLoggedIn, admin, deleteImage);
 router.post("/details", isLoggedIn, getImageById);
 router.get("/", isLoggedIn, getUserImages);
 router.post("/by-camera", isLoggedIn, getImagesByCamera);
+router.post("/project", isLoggedIn, imagesByProjectId);
 
 // Annotation endpoints
 router.post("/annotation", isLoggedIn, getImagesForAnnotation);

@@ -353,6 +353,35 @@ const updateGroundTruth = async (req, res) => {
     return res.status(500).json({ success: false, message: "Server error" });
   }
 };
+
+const imagesByProjectId = async (req, res) => {
+  try {
+    const { projectId } = req.body;
+
+    if (!projectId) {
+      res.status(400).json({
+        success: false,
+        message: "ProjectId required",
+      });
+    }
+
+    const db = getDB();
+    const result = await imageModel.getImagesByProjectId(db, projectId);
+    const count = result.length;
+    return res.status(200).json({
+      success: true,
+      count: count,
+      data: result,
+    });
+  } catch (err) {
+    console.error("getImageByProjectId error: ", err);
+    return res.status(500).json({
+      success: false,
+      message: "Server error",
+    });
+  }
+};
+
 // Count endpoints
 async function countHelper(req, res, level) {
   try {
@@ -468,4 +497,5 @@ module.exports = {
   getImagesForAnnotation,
   uploadInferenceImage,
   dashboardData,
+  imagesByProjectId,
 };

@@ -6,7 +6,7 @@ const organizationModel = require("../models/organizationModel");
 // Create Project (admin only)
 const createProject = async (req, res) => {
   try {
-    const { name, description, organizationId, settings } = req.body;
+    const { name, description, organizationId } = req.body;
 
     if (!name || !organizationId) {
       return res.status(400).json({
@@ -37,7 +37,6 @@ const createProject = async (req, res) => {
         user_id: new ObjectId(req.user._id),
         name: req.user.name,
       },
-      settings,
       active: true,
     };
 

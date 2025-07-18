@@ -1,4 +1,4 @@
-const { ObjectId } = require('mongodb');
+const { ObjectId } = require("mongodb");
 
 /*
  Project Schema (documentation purposes)
@@ -25,35 +25,31 @@ const projectSchema = {
     trim: true,
     validate: {
       validator: (v) => v.length >= 3,
-      message: 'Project name must be at least 3 characters long'
-    }
+      message: "Project name must be at least 3 characters long",
+    },
   },
   description: {
     type: String,
-    default: ''
+    default: "",
   },
   organization_id: {
     type: ObjectId,
-    required: true
+    required: true,
   },
   organization_name: {
     type: String,
-    required: true
-  },
-  settings:{
-    type: Object,
-    default: {}
+    required: true,
   },
   created_by: {
     type: Object,
-    required: true // { user_id, name }
+    required: true, // { user_id, name }
   },
   active: {
     type: Boolean,
-    default: true
+    default: true,
   },
   created_at: { type: Date, default: () => new Date() },
-  updated_at: { type: Date, default: () => new Date() }
+  updated_at: { type: Date, default: () => new Date() },
 };
 
 function validateProject(projectData) {
@@ -62,32 +58,43 @@ function validateProject(projectData) {
   for (const [field, config] of Object.entries(projectSchema)) {
     if (config.required && projectData[field] === undefined) {
       errors[field] = `${field} is required`;
-    } else if (config.validate && projectData[field] !== undefined && !config.validate.validator(projectData[field])) {
+    } else if (
+      config.validate &&
+      projectData[field] !== undefined &&
+      !config.validate.validator(projectData[field])
+    ) {
       errors[field] = config.validate.message;
     }
   }
 
   return {
     isValid: Object.keys(errors).length === 0,
-    errors
+    errors,
   };
 }
 
 async function createProject(db, projectData) {
   const validation = validateProject(projectData);
-  if (!validation.isValid) throw new Error(`Validation failed: ${JSON.stringify(validation.errors)}`);
+  if (!validation.isValid)
+    throw new Error(`Validation failed: ${JSON.stringify(validation.errors)}`);
 
   // Ensure name uniqueness within the same organization
-  const existing = await db.collection('projects').findOne({
+  const existing = await db.collection("projects").findOne({
     name: projectData.name,
-    organization_id: new ObjectId(projectData.organization_id)
+    organization_id: new ObjectId(projectData.organization_id),
   });
-  if (existing) throw new Error('Project with this name already exists in the organization');
+  if (existing)
+    throw new Error(
+      "Project with this name already exists in the organization"
+    );
 
   // Set defaults
   for (const [field, config] of Object.entries(projectSchema)) {
     if (config.default !== undefined && projectData[field] === undefined) {
-      projectData[field] = typeof config.default === 'function' ? config.default() : config.default;
+      projectData[field] =
+        typeof config.default === "function"
+          ? config.default()
+          : config.default;
     }
   }
 
@@ -95,30 +102,36 @@ async function createProject(db, projectData) {
   projectData.organization_id = new ObjectId(projectData.organization_id);
   projectData.created_by.user_id = new ObjectId(projectData.created_by.user_id);
 
-  const result = await db.collection('projects').insertOne(projectData);
-  return await db.collection('projects').findOne({ _id: result.insertedId });
+  const result = await db.collection("projects").insertOne(projectData);
+  return await db.collection("projects").findOne({ _id: result.insertedId });
 }
 
 async function findProjectById(db, id) {
   try {
-    return await db.collection('projects').findOne({ _id: new ObjectId(id) });
+    return await db.collection("projects").findOne({ _id: new ObjectId(id) });
   } catch (err) {
-    console.error('Error findProjectById:', err);
+    console.error("Error findProjectById:", err);
     return null;
   }
 }
 
 async function getAllProjects(db) {
-  return await db.collection('projects').find().toArray();
+  return await db.collection("projects").find().toArray();
 }
 
 async function findProjectsByOrganizationId(db, orgId) {
-  return await db.collection('projects').find({ organization_id: new ObjectId(orgId) }).toArray();
+  return await db
+    .collection("projects")
+    .find({ organization_id: new ObjectId(orgId) })
+    .toArray();
 }
 
 async function findProjectsForUser(db, userOrgIds) {
   const objectIds = userOrgIds.map((id) => new ObjectId(id));
-  return await db.collection('projects').find({ organization_id: { $in: objectIds } }).toArray();
+  return await db
+    .collection("projects")
+    .find({ organization_id: { $in: objectIds } })
+    .toArray();
 }
 
 async function updateProject(db, id, updateData) {
@@ -128,12 +141,16 @@ async function updateProject(db, id, updateData) {
   delete updateData.organization_name;
   delete updateData.created_by;
 
-  await db.collection('projects').updateOne({ _id: new ObjectId(id) }, { $set: updateData });
+  await db
+    .collection("projects")
+    .updateOne({ _id: new ObjectId(id) }, { $set: updateData });
   return await findProjectById(db, id);
 }
 
 async function deleteProject(db, id) {
-  const result = await db.collection('projects').deleteOne({ _id: new ObjectId(id) });
+  const result = await db
+    .collection("projects")
+    .deleteOne({ _id: new ObjectId(id) });
   return result.deletedCount > 0;
 }
 
@@ -146,5 +163,5 @@ module.exports = {
   findProjectsByOrganizationId,
   findProjectsForUser,
   updateProject,
-  deleteProject
+  deleteProject,
 };

@@ -106,10 +106,21 @@ async function updateInference(db, id, data) {
 }
 
 async function getImagesForAnnotation(db, cameraId) {
-  return await db.collection("images").find({
-    "camera.id": new ObjectId(cameraId),
-    ground_truth: { $exists: false },
-  }).toArray();
+  return await db
+    .collection("images")
+    .find({
+      "camera.id": new ObjectId(cameraId),
+      ground_truth: { $exists: false },
+    })
+    .toArray();
+}
+async function getImagesByProjectId(db, id) {
+  return await db
+    .collection("images")
+    .find({
+      "project.id": new ObjectId(id),
+    })
+    .toArray();
 }
 
 module.exports = {
@@ -123,4 +134,5 @@ module.exports = {
   updateGroundTruth,
   updateInference,
   getImagesForAnnotation,
+  getImagesByProjectId,
 };
