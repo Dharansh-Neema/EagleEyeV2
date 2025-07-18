@@ -407,6 +407,53 @@ const countProjectImages = (req, res) => countHelper(req, res, "project");
 const countStationImages = (req, res) => countHelper(req, res, "station");
 const countCameraImages = (req, res) => countHelper(req, res, "camera");
 
+const dashboardData = async (req, res) => {
+  try {
+    const { projectId } = req.body;
+    console.log(projectId);
+    const db = getDB();
+
+    const projectObjectId = new ObjectId(projectId);
+
+    // Count images in project
+    const totalImages = await db
+      .collection("images")
+      .countDocuments({ "project.id": projectObjectId });
+    console.log(totalImages);
+    // Count cameras in project
+    const camerasPromise = db
+      .collection("cameras")
+      .countDocuments({ project_id: projectObjectId });
+
+    // Count annotated images
+    const annotatedPromise = db.collection("images").countDocuments({
+      "project.id": projectObjectId,
+      ground_truth: { $exists: true },
+    });
+
+    // Run in parallel for speed
+    const [cameras, annotated] = await Promise.all([
+      camerasPromise,
+      annotatedPromise,
+    ]);
+
+    const pending = totalImages - annotated;
+
+    return res.status(200).json({
+      success: true,
+      data: {
+        totalImages,
+        cameras,
+        annotated,
+        pending,
+      },
+    });
+  } catch (err) {
+    console.error("dashboardData error:", err);
+    return res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
 module.exports = {
   uploadImage,
   deleteImage,
@@ -420,4 +467,5 @@ module.exports = {
   updateGroundTruth,
   getImagesForAnnotation,
   uploadInferenceImage,
+  dashboardData,
 };

@@ -12,6 +12,7 @@ const {
   getImagesForAnnotation,
   updateGroundTruth,
   uploadInferenceImage,
+  dashboardData,
 } = require("../controllers/imageController");
 
 const { isLoggedIn, admin } = require("../middleware/authMiddleware");
@@ -37,5 +38,6 @@ router.post("/count/organization", isLoggedIn, countOrganizationImages);
 router.post("/count/project", isLoggedIn, countProjectImages);
 router.post("/count/station", isLoggedIn, countStationImages);
 router.post("/count/camera", isLoggedIn, countCameraImages);
+router.post("/dashboard", isLoggedIn, dashboardData);
 
 module.exports = router;
