@@ -13,10 +13,7 @@ const dataset ={
         type:ObjectId,
         required:true
     },
-    images:[{
-        type:document,
-        required:true
-    }],
+    images:[],
     created_at:{
         type:Date,
         default:Date.now
