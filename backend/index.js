@@ -13,6 +13,7 @@ const observationRoutes = require("./routes/observationRoutes");
 const inspectionStationRoutes = require("./routes/inspectionStationRoutes");
 const cameraRoutes = require("./routes/cameraRoutes");
 const imageRoutes = require("./routes/imageRoutes");
+const datasetRoutes = require("./routes/datasetRoutes");
 
 // Initialize express app
 const app = express();
@@ -37,7 +38,7 @@ app.use("/api/observations", observationRoutes);
 app.use("/api/inspection-stations", inspectionStationRoutes);
 app.use("/api/cameras", cameraRoutes);
 app.use("/api/images", imageRoutes);
-
+app.use("/api/datasets", datasetRoutes);
 // Root route
 app.get("/", (req, res) => {
   res.send("EagleEye Backend is running...");
