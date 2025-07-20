@@ -9,7 +9,7 @@ const dataset ={
         type:ObjectId,
         required:true
     },
-    project_id:{
+    projectId:{
         type:ObjectId,
         required:true
     },
@@ -26,7 +26,7 @@ const dataset ={
 
 async function createDataset(db,data){
     try{
-        const project = await projectModel.findProjectById(db,data.project_id);
+        const project = await projectModel.findProjectById(db,data.projectId);
         if (!project) {
             throw new Error('Project not found');
         }
@@ -52,7 +52,7 @@ async function findDatasetById(db,id){
 
 async function findDatasetByProjectId(db,id){
     try{
-        return await db.collection("datasets").find({ project_id: new ObjectId(id) }).toArray();
+        return await db.collection("datasets").find({ projectId: new ObjectId(id) }).toArray();
     }
     catch(err){
         throw new Error(err);
@@ -131,7 +131,7 @@ async function removeImageFromDataset(db, datasetId, imageId) {
 async function getDatasetCountByProject(db, projectId) {
     try {
         return await db.collection("datasets")
-            .countDocuments({ project_id: new ObjectId(projectId) });
+            .countDocuments({ projectId: new ObjectId(projectId) });
     }
     catch(err) {
         throw new Error(err);

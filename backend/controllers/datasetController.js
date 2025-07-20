@@ -16,19 +16,19 @@ const organizationModel = require("../models/organizationModel");
 // Create Dataset - Admin only
 const createDatasetMethod = async (req, res) => {
     try {
-        const { name, project_id, images } = req.body;
+        const { name, projectId, images } = req.body;
         
-        if (!name || !project_id) {
+        if (!name || !projectId) {
             return res.status(400).json({
                 success: false,
-                message: "Name and project_id are required"
+                message: "Name and projectId are required"
             });
         }
 
         const db = getDB();
         const datasetData = {
             name,
-            project_id: new ObjectId(project_id),
+            projectId: new ObjectId(projectId),
             images: images || []
         };
 
@@ -96,9 +96,9 @@ const getDatasetById = async (req, res) => {
 // Get Datasets by Project ID
 const getDatasetsByProject = async (req, res) => {
     try {
-        const { project_id } = req.body;
+        const { projectId } = req.body;
         
-        if (!ObjectId.isValid(project_id)) {
+        if (!ObjectId.isValid(projectId)) {
             return res.status(400).json({
                 success: false,
                 message: "Invalid project ID"
@@ -106,7 +106,7 @@ const getDatasetsByProject = async (req, res) => {
         }
 
         const db = getDB();
-        const datasets = await findDatasetByProjectId(db, project_id);
+        const datasets = await findDatasetByProjectId(db, projectId);
 
         // Authorization check for non-admin users
         if (req.user.role !== "admin" && datasets.length > 0) {
