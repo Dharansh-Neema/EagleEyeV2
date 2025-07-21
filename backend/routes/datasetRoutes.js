@@ -9,7 +9,8 @@ const {
     getUserDatasets,
     addImageToDatasetMethod,
     removeImageFromDatasetMethod,
-    getDatasetStats
+    getDatasetStats,
+    updateImagetoDatasetMethod
 } = require("../controllers/datasetController");
 
 const { isLoggedIn, admin } = require("../middleware/authMiddleware");
@@ -24,7 +25,7 @@ router.delete("/delete", isLoggedIn, admin, deleteDatasetMethod);
 // Image management routes - Admin only
 router.post("/add", isLoggedIn, admin, addImageToDatasetMethod);
 router.post("/remove", isLoggedIn, admin, removeImageFromDatasetMethod);
-
+router.post("/update/image",isLoggedIn,admin,updateImagetoDatasetMethod)
 // Organization datasets - Admin only
 router.post("/organization", isLoggedIn, admin, getDatasetsByOrganization);
 

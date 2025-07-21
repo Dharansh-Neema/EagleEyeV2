@@ -7,7 +7,8 @@ const {
     deleteDataset,
     addImageToDataset,
     removeImageFromDataset,
-    getDatasetCountByProject
+    getDatasetCountByProject,
+    updateImageInDataset
 } = require("../models/datasetModel");
 const { getDB } = require("../config/db");
 const { ObjectId } = require("mongodb");
@@ -359,7 +360,51 @@ const removeImageFromDatasetMethod = async (req, res) => {
         });
     }
 };
-
+const updateImagetoDatasetMethod = async (req, res) => {
+    try {
+        const { datasetId, imageId, imageData } = req.body;
+        
+        // Validate required fields
+        if (!datasetId || !imageId) {
+            return res.status(400).json({
+                success: false,
+                message: "datasetId and imageId are required"
+            });
+        }
+        
+        // Validate imageData
+        if (!imageData || typeof imageData !== 'object') {
+            return res.status(400).json({
+                success: false,
+                message: "imageData is required and must be an object"
+            });
+        }
+        
+        const db = getDB();
+        
+        // Try to validate the dataset ID
+        if (!datasetId || !ObjectId.isValid(datasetId)) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid datasetId format"
+            });
+        }
+        
+        const result = await updateImageInDataset(db, datasetId, imageId, imageData);
+        
+        return res.status(200).json({
+            success: true,
+            message: "Image updated in dataset successfully",
+            data: result
+        });
+    } catch (error) {
+        console.error("Error updating image in dataset:", error);
+        return res.status(500).json({
+            success: false,
+            message: error.message || "Internal server error"
+        });
+    }
+};
 // Get Dataset Statistics
 const getDatasetStats = async (req, res) => {
     try {
@@ -449,5 +494,6 @@ module.exports = {
     getUserDatasets,
     addImageToDatasetMethod,
     removeImageFromDatasetMethod,
+    updateImagetoDatasetMethod,
     getDatasetStats
 };
