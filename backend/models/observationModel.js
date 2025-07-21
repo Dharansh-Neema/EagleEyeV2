@@ -142,18 +142,18 @@ async function updateObservation(db, id, updateData) {
   delete updateData.organization_name;
 
   // If updating data_type or value, ensure consistency
-  if (updateData.data_type || updateData.value !== undefined) {
-    const obs = await findObservationById(db, id);
-    const temp = {
-      ...obs,
-      ...updateData,
-    };
-    const validation = validateObservation(temp);
-    if (!validation.isValid)
-      throw new Error(
-        `Validation failed: ${JSON.stringify(validation.errors)}`
-      );
-  }
+  // if (updateData.data_type || updateData.value !== undefined) {
+  //   const obs = await findObservationById(db, id);
+  //   const temp = {
+  //     ...obs,
+  //     ...updateData,
+  //   };
+    // const validation = validateObservation(temp);
+    // if (!validation.isValid)
+    //   throw new Error(
+    //     `Validation failed: ${JSON.stringify(validation.errors)}`
+    //   );
+  // }
 
   await db
     .collection("observations")

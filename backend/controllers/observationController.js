@@ -55,7 +55,7 @@ const updateObservation = async (req, res) => {
         .json({ success: false, message: "observationId required" });
 
     const db = getDB();
-    const obs = await observationModel.findObservationById(db, observationId);
+    const obs = await observationModel.updateObservation(db, observationId, updateData);
     if (!obs)
       return res
         .status(404)

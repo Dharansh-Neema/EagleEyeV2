@@ -11,6 +11,7 @@ const {
   countCameraImages,
   getImagesForAnnotation,
   updateGroundTruth,
+  updateGrading,
   uploadInferenceImage,
   dashboardData,
   imagesByProjectId,
@@ -34,6 +35,7 @@ router.post("/project", isLoggedIn, imagesByProjectId);
 // Annotation endpoints
 router.post("/annotation", isLoggedIn, getImagesForAnnotation);
 router.post("/ground-truth", isLoggedIn, updateGroundTruth);
+router.post("/grading", isLoggedIn, updateGrading);
 
 // Count endpoints
 router.post("/count/organization", isLoggedIn, countOrganizationImages);

@@ -24,6 +24,7 @@ const imageSchema = {
 
   ground_truth: { type: Object, required: false },
   inference: { type: Object, required: false },
+  grading: { type: Object, required: false },
   full_path: { type: String, required: true },
   created_at: { type: Date, default: () => new Date() },
   updated_at: { type: Date, default: () => new Date() },
@@ -105,6 +106,13 @@ async function updateInference(db, id, data) {
     .updateOne({ _id: new ObjectId(id) }, { $set: { inference: data } });
 }
 
+async function updateGrading(db, id, data) {
+   await db
+    .collection("images")
+    .updateOne({ _id: new ObjectId(id) }, { $set: { grading: data } });
+    return await db.collection("images").findOne({ _id: new ObjectId(id) });
+}
+
 async function getImagesForAnnotation(db, cameraId) {
   return await db
     .collection("images")
@@ -133,6 +141,7 @@ module.exports = {
   countImages,
   updateGroundTruth,
   updateInference,
+  updateGrading,
   getImagesForAnnotation,
   getImagesByProjectId,
 };
