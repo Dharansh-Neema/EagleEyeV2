@@ -7,6 +7,7 @@ const {
   getCameraById,
   getUserCameras,
   getCameraByStationId,
+  getCameraByProjectId,
 } = require("../controllers/cameraController");
 const { isLoggedIn, admin } = require("../middleware/authMiddleware");
 
@@ -23,4 +24,5 @@ router.post("/details", isLoggedIn, getCameraById);
 router.get("/", isLoggedIn, getUserCameras);
 
 router.post("/station", isLoggedIn, getCameraByStationId);
+router.post("/project", isLoggedIn, getCameraByProjectId);
 module.exports = router;

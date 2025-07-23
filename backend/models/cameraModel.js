@@ -77,6 +77,10 @@ async function findCamerasByStationId(db, stationId) {
   return await db.collection('cameras').find({ inspection_station_id: new ObjectId(stationId) }).toArray();
 }
 
+async function findCamerasByProjectId(db, projectId) {
+  return await db.collection('cameras').find({ project_id: new ObjectId(projectId) }).toArray();
+}
+
 async function findCamerasForUser(db, orgIds) {
   const ids = orgIds.map((id) => new ObjectId(id));
   return await db.collection('cameras').find({ organization_id: { $in: ids } }).toArray();

@@ -220,6 +220,25 @@ const getCameraByStationId = async (req, res) => {
     return res.status(500).json({ success: false, message: "Server error" });
   }
 };
+
+const getCameraByProjectId = async (req, res) => {
+  try {
+    const { projectId } = req.body;
+    if (!projectId)
+      return res
+        .status(400)
+        .json({ success: false, message: "projectId required" });
+
+    const db = getDB();
+    const cameras = await cameraModel.findCamerasByProjectId(db, projectId);
+    return res
+      .status(200)
+      .json({ success: true, count: cameras.length, data: cameras });
+  } catch (err) {
+    console.error("getCameraByProjectId error:", err);
+    return res.status(500).json({ success: false, message: "Server error" });
+  }
+};
 module.exports = {
   createCamera,
   updateCamera,
@@ -228,4 +247,5 @@ module.exports = {
   getCameraById,
   getUserCameras,
   getCameraByStationId,
+  getCameraByProjectId,
 };
