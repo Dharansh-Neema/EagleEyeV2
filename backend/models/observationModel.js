@@ -24,6 +24,8 @@ const observationSchema = {
   project_name: { type: String, required: true },
   organization_id: { type: ObjectId, required: true },
   organization_name: { type: String, required: true },
+  camera_id: { type: ObjectId, required: true },
+  camera_name: { type: String, required: true },
   data_type: {
     type: String,
     required: true,
@@ -95,6 +97,7 @@ async function createObservation(db, obsData) {
   // Cast IDs
   obsData.project_id = new ObjectId(obsData.project_id);
   obsData.organization_id = new ObjectId(obsData.organization_id);
+  obsData.camera_id = new ObjectId(obsData.camera_id);
 
   const result = await db.collection("observations").insertOne(obsData);
   return await db
@@ -161,6 +164,12 @@ async function updateObservation(db, id, updateData) {
   return await findObservationById(db, id);
 }
 
+async function findObservationsByCameraId(db, cameraId) {
+  return await db
+    .collection("observations")
+    .find({ camera_id: new ObjectId(cameraId) })
+    .toArray();
+}
 async function deleteObservation(db, id) {
   const result = await db
     .collection("observations")
@@ -177,5 +186,6 @@ module.exports = {
   findObservationsForUser,
   updateObservation,
   deleteObservation,
+  findObservationsByCameraId,
   ALLOWED_DATA_TYPES,
 };

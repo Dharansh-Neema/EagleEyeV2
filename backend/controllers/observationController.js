@@ -7,12 +7,12 @@ const organizationModel = require("../models/organizationModel");
 // Admin only
 const createObservation = async (req, res) => {
   try {
-    const { name, projectId, data_type } = req.body;
+    const { name, projectId, data_type, cameraId } = req.body;
 
-    if (!name || !projectId || !data_type) {
+    if (!name || !projectId || !data_type || !cameraId) {
       return res.status(400).json({
         success: false,
-        message: "Please provide name, projectId and data_type",
+        message: "Please provide name, projectId, data_type and cameraId",
       });
     }
 
@@ -24,6 +24,12 @@ const createObservation = async (req, res) => {
       return res
         .status(404)
         .json({ success: false, message: "Project not found" });
+    
+    const camera = await cameraModel.findCameraById(db, cameraId);
+    if (!camera)
+      return res
+        .status(404)
+        .json({ success: false, message: "Camera not found" });
 
     // Build document
     const obsData = {
@@ -32,6 +38,8 @@ const createObservation = async (req, res) => {
       project_name: project.name,
       organization_id: project.organization_id,
       organization_name: project.organization_name,
+      camera_id: new ObjectId(cameraId),
+      camera_name: camera.name,
       data_type,
     };
 
@@ -208,6 +216,32 @@ const getObservationsByProjectId = async (req, res) => {
   }
 };
 
+const getObservationsByCameraId = async (req, res) => {
+  try {
+    const { cameraId } = req.body;
+    if (!cameraId)
+      return res
+        .status(400)
+        .json({ success: false, message: "cameraId required" });
+
+    const db = getDB();
+    const obs = await observationModel.findObservationsByCameraId(
+      db,
+      cameraId
+    );
+    if (!obs) {
+      return res
+        .status(404)
+        .json({ success: false, message: "No observations found" });
+    }
+    return res
+      .status(200)
+      .json({ success: true, count: obs.length, data: obs });
+  } catch (err) {
+    console.error("getObservationsByCameraId error:", err);
+    return res.status(500).json({ success: false, message: "Server error" });
+  }
+};
 module.exports = {
   createObservation,
   updateObservation,
@@ -216,4 +250,5 @@ module.exports = {
   getObservationById,
   getUserObservations,
   getObservationsByProjectId,
+  getObservationsByCameraId,
 };

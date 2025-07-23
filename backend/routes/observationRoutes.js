@@ -7,6 +7,7 @@ const {
   getObservationById,
   getUserObservations,
   getObservationsByProjectId,
+  getObservationsByCameraId,
 } = require("../controllers/observationController");
 
 const { isLoggedIn, admin } = require("../middleware/authMiddleware");
@@ -19,6 +20,7 @@ router.put("/", isLoggedIn, admin, updateObservation);
 router.delete("/", isLoggedIn, admin, deleteObservation);
 router.get("/all", isLoggedIn, admin, getAllObservations);
 router.post("/project", isLoggedIn, getObservationsByProjectId);
+router.post("/camera", isLoggedIn, getObservationsByCameraId);
 
 // Shared routes
 router.post("/details", isLoggedIn, getObservationById);
