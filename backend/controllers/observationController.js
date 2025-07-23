@@ -3,7 +3,7 @@ const { getDB } = require("../config/db");
 const observationModel = require("../models/observationModel");
 const projectModel = require("../models/projectModel");
 const organizationModel = require("../models/organizationModel");
-
+const cameraModel = require("../models/cameraModel");
 // Admin only
 const createObservation = async (req, res) => {
   try {
