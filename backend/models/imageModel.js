@@ -26,6 +26,7 @@ const imageSchema = {
   inference: { type: Object, required: false },
   grading: { type: Object, required: false },
   full_path: { type: String, required: true },
+  url: { type: String, required: false },
   created_at: { type: Date, default: () => new Date() },
   updated_at: { type: Date, default: () => new Date() },
 };

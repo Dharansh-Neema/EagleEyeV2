@@ -9,13 +9,14 @@ const organizationModel = require("../models/organizationModel");
 const { error } = require("console");
 const ExifImage = require("exif").ExifImage;
 const STORAGE_ROOT = path.join(__dirname, "../../storage");
+const { uploadFile, deleteFile } = require("../utils/b2");
 
 // Ensure a directory exists
 function ensureDir(p) {
   if (!fs.existsSync(p)) fs.mkdirSync(p, { recursive: true });
 }
 
-// Middleware to fetch camera + build path
+// Middleware to fetch camera and authorize access
 async function prefetchCamera(req, res, next) {
   try {
     const { cameraId } = req.query;
@@ -45,25 +46,9 @@ async function prefetchCamera(req, res, next) {
           .json({ success: false, message: "Not authorized" });
       }
     }
-
-    // Build dynamic path
-    const now = new Date();
-    const folders = [
-      camera.organization_id.toString(),
-      camera.project_id.toString(),
-      camera.inspection_station_id?.toString() ||
-        camera.inspection_station?.id?.toString() ||
-        "",
-      camera._id.toString(),
-      now.getFullYear().toString(),
-      (now.getMonth() + 1).toString().padStart(2, "0"),
-      now.getDate().toString().padStart(2, "0"),
-    ];
-    const destPath = path.join(STORAGE_ROOT, ...folders);
-    ensureDir(destPath);
-
+    
+    // Store camera info in request object for later use
     req._camera = camera;
-    req._imageDestPath = destPath;
     next();
   } catch (err) {
     console.error("prefetchCamera error:", err);
@@ -71,18 +56,13 @@ async function prefetchCamera(req, res, next) {
   }
 }
 
-// Multer storage settings (destination is set in middleware above)
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, req._imageDestPath);
-  },
-  filename: (req, file, cb) => {
-    const uniqueName = `${Date.now()}_${file.originalname}`;
-    cb(null, uniqueName);
-  },
+// Use memory storage for B2 uploads
+const upload = multer({ 
+  storage: multer.memoryStorage(),
+  limits: {
+    fileSize: 100 * 1024 * 1024, // 100MB limit
+  }
 });
-
-const upload = multer({ storage });
 
 // Admin-only upload (multi-image)
 const uploadImage = [
@@ -101,10 +81,29 @@ const uploadImage = [
       const cam = req._camera;
       const savedImages = [];
 
+      // Build dynamic folder path structure
+      const now = new Date();
+      const folders = [
+        cam.organization_id.toString(),
+        cam.project_id.toString(),
+        cam.inspection_station_id?.toString() ||
+          cam.inspection_station?.id?.toString() ||
+          "",
+        cam._id.toString(),
+        now.getFullYear().toString(),
+        (now.getMonth() + 1).toString().padStart(2, "0"),
+        now.getDate().toString().padStart(2, "0")
+      ].join("/"); // Create path with forward slashes
+
       for (const file of req.files) {
-        const relPath = path.relative(STORAGE_ROOT, file.path);
+        const filename = `${Date.now()}_${file.originalname}`;
+        const filePath = `${folders}/${filename}`;
+        
+        // Upload file to B2
+        const {path,url} = await uploadFile(file.buffer, filePath, file.mimetype);
+        
         const imageDoc = {
-          filename: file.filename,
+          filename: filename,
           organization: {
             id: cam.organization_id,
             name: cam.organization_name || "",
@@ -115,8 +114,10 @@ const uploadImage = [
             name: cam.inspection_station_name || "",
           },
           camera: { id: cam._id, name: cam.name },
-          full_path: relPath,
+          full_path: path, // Store B2 path in MongoDB
+          url : url
         };
+        
         const saved = await imageModel.createImage(db, imageDoc);
         savedImages.push(saved);
       }
@@ -150,19 +151,39 @@ const uploadInferenceImage = [
       const db = getDB();
       const cam = req._camera;
       const saved = [];
+      
+      // Build dynamic folder path structure (similar to local storage)
+      const now = new Date();
+      const folders = [
+        cam.organization_id.toString(),
+        cam.project_id.toString(),
+        cam.inspection_station_id?.toString() ||
+          cam.inspection_station?.id?.toString() ||
+          "",
+        cam._id.toString(),
+        now.getFullYear().toString(),
+        (now.getMonth() + 1).toString().padStart(2, "0"),
+        now.getDate().toString().padStart(2, "0")
+      ].join("/"); // Create path with forward slashes
 
       for (const file of req.files) {
-        const relPath = path.relative(STORAGE_ROOT, file.path);
+        const filename = `${Date.now()}_${file.originalname}`;
+        const filePath = `${folders}/${filename}`;
+        
+        // Upload file to B2
+        const { path, url } = await uploadFile(file.buffer, filePath, file.mimetype);
+        console.log(path,url);
 
         let inference = {};
         try {
-          inference = await exifr.parse(file.path); // ← EXIF in one line
+          // Extract EXIF data from buffer instead of file path
+          inference = await exifr.parse(file.buffer);
         } catch (e) {
-          console.warn(`EXIF parse failed for ${file.filename}:`, e.message);
+          console.warn(`EXIF parse failed for ${filename}:`, e.message);
         }
 
         const doc = {
-          filename: file.filename,
+          filename: filename,
           organization: {
             id: cam.organization_id,
             name: cam.organization_name || "",
@@ -174,7 +195,8 @@ const uploadInferenceImage = [
           },
           camera: { id: cam._id, name: cam.name },
           inference,
-          full_path: relPath,
+          full_path: path,
+          url : url
         };
 
         saved.push(await imageModel.createImage(db, doc));
@@ -207,9 +229,13 @@ const deleteImage = async (req, res) => {
         .status(404)
         .json({ success: false, message: "Image not found" });
 
-    // Delete file from disk
-    const absPath = path.join(STORAGE_ROOT, img.full_path);
-    if (fs.existsSync(absPath)) fs.unlinkSync(absPath);
+    try {
+      // Delete file from B2 storage
+      await deleteFile(img.full_path);
+    } catch (deleteErr) {
+      console.warn(`Failed to delete file from B2: ${img.full_path}`, deleteErr);
+      // Continue with the image deletion from DB even if B2 deletion fails
+    }
 
     await imageModel.deleteImage(db, imageId);
     return res.status(200).json({ success: true, message: "Image deleted" });
