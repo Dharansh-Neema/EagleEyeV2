@@ -10,7 +10,8 @@ const {
     addImageToDatasetMethod,
     removeImageFromDatasetMethod,
     getDatasetStats,
-    updateImagetoDatasetMethod
+    updateImagetoDatasetMethod,
+    getAllDatasetsMethod
 } = require("../controllers/datasetController");
 
 const { isLoggedIn, admin } = require("../middleware/authMiddleware");
@@ -34,5 +35,5 @@ router.get("/", isLoggedIn, getUserDatasets);
 router.get("/stats", isLoggedIn, getDatasetStats);
 router.post("/details", isLoggedIn, getDatasetById);
 router.post("/by-project", isLoggedIn, getDatasetsByProject);
-
+router.get("/all", isLoggedIn, admin, getAllDatasetsMethod);
 module.exports = router;

@@ -8,6 +8,7 @@ const {
     addImageToDataset,
     removeImageFromDataset,
     getDatasetCountByProject,
+    getAllDataset,
     updateImageInDataset
 } = require("../models/datasetModel");
 const { getDB } = require("../config/db");
@@ -484,6 +485,25 @@ const getDatasetsByOrganization = async (req, res) => {
     }
 };
 
+// Get All Datasets - Admin only
+const getAllDatasetsMethod = async (req, res) => {
+    try {
+        const db = getDB();
+        const datasets = await getAllDataset(db);
+
+        return res.status(200).json({
+            success: true,
+            count: datasets.length,
+            data: datasets
+        });
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+};
+
 module.exports = {
     createDatasetMethod,
     getDatasetById,
@@ -495,5 +515,6 @@ module.exports = {
     addImageToDatasetMethod,
     removeImageFromDatasetMethod,
     updateImagetoDatasetMethod,
-    getDatasetStats
+    getDatasetStats,
+    getAllDatasetsMethod
 };

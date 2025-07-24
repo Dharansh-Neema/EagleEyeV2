@@ -114,5 +114,6 @@ module.exports = {
   findCamerasByStationId,
   findCamerasForUser,
   updateCamera,
-  deleteCamera
+  deleteCamera,
+  findCamerasByProjectId
 };

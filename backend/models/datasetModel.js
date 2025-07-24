@@ -240,6 +240,14 @@ async function getDatasetCountByProject(db, projectId) {
     }
 }
 
+async function getAllDataset(db) {
+    try {
+        return await db.collection("datasets").find().toArray();
+    }
+    catch(err) {
+        throw new Error(err);
+    }
+}
 module.exports = {
     createDataset,
     findDatasetById,
@@ -250,5 +258,6 @@ module.exports = {
     addImageToDataset,
     removeImageFromDataset,
     updateImageInDataset,
-    getDatasetCountByProject
+    getDatasetCountByProject,
+    getAllDataset
 }
