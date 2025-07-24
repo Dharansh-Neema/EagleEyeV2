@@ -6,9 +6,6 @@ const { getDB } = require("../config/db");
 const cameraModel = require("../models/cameraModel");
 const imageModel = require("../models/imageModel");
 const organizationModel = require("../models/organizationModel");
-const { error } = require("console");
-const ExifImage = require("exif").ExifImage;
-const STORAGE_ROOT = path.join(__dirname, "../../storage");
 const { uploadFile, deleteFile } = require("../utils/b2");
 
 // Ensure a directory exists
