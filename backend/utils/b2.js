@@ -61,7 +61,29 @@ async function deleteFile(path) {
 function getPublicUrl(path) {
   // The format depends on your B2 bucket setup - this assumes public bucket
   const bucketName = process.env.B2_BUCKET_NAME;
-  return `https://${bucketName}.s3.us-west-004.backblazeb2.com/${path}`;
+  return `https://${bucketName}.s3.us-east-005.backblazeb2.com/${path}`;
 }
 
-module.exports = { uploadFile, deleteFile, getPublicUrl };
+/**
+ * Download a file from B2 as a Buffer
+ * @param {string} path - The path of the file in B2
+ * @returns {Promise<{buffer: Buffer, mimeType: string, fileName: string}>}
+ */
+async function downloadFile(path) {
+  await authorize();
+  const bucketName = process.env.B2_BUCKET_NAME;
+  // Download file by name
+  const response = await b2.downloadFileByName({
+    bucketName,
+    fileName: path,
+    responseType: 'arraybuffer',
+  });
+  // response.data is a Buffer (in Node.js)
+  return {
+    buffer: Buffer.from(response.data),
+    mimeType: response.headers['content-type'] || 'application/octet-stream',
+    fileName: path.split('/').pop(),
+  };
+}
+
+module.exports = { uploadFile, deleteFile, getPublicUrl, downloadFile };

@@ -6,7 +6,7 @@ const { getDB } = require("../config/db");
 const cameraModel = require("../models/cameraModel");
 const imageModel = require("../models/imageModel");
 const organizationModel = require("../models/organizationModel");
-const { uploadFile, deleteFile } = require("../utils/b2");
+const { uploadFile, deleteFile, downloadFile } = require("../utils/b2");
 
 // Ensure a directory exists
 function ensureDir(p) {
@@ -526,6 +526,24 @@ const dashboardData = async (req, res) => {
   }
 };
 
+// Proxy B2 private image to client
+async function getB2Image(req, res) {
+  try {
+    const path = req.query.path;
+    if (!path) {
+      return res.status(400).json({ success: false, message: "Missing B2 path" });
+    }
+    // Optionally: check user permissions here
+    const { buffer, mimeType, fileName } = await downloadFile(path);
+    res.setHeader('Content-Type', mimeType);
+    res.setHeader('Content-Disposition', `inline; filename="${fileName}"`);
+    res.send(buffer);
+  } catch (err) {
+    console.error("getB2Image error:", err);
+    res.status(500).json({ success: false, message: "Could not fetch image" });
+  }
+}
+
 module.exports = {
   uploadImage,
   deleteImage,
@@ -541,5 +559,6 @@ module.exports = {
   uploadInferenceImage,
   dashboardData,
   imagesByProjectId,
-  updateGrading
+  updateGrading,
+  getB2Image
 };
