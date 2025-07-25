@@ -35,7 +35,7 @@ async function uploadFile(fileBuffer, path, mimeType) {
   // Return the B2 file path (store this in MongoDB)
   return {
     path: uploadRes.data.fileName,
-    url: `https://${bucketName}.s3.us-west-004.backblazeb2.com/${uploadRes.data.fileName}`,
+    url: `https://${bucketName}.s3.us-east-005.backblazeb2.com/${uploadRes.data.fileName}`,
   };
 }
 
