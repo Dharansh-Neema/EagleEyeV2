@@ -70,9 +70,17 @@ const getUserOrganizations = async (req, res) => {
     
     // If admin, they can see all organizations they created or are a member of
     // If regular user, they can only see organizations they are a member of
+    const user = await userModel.findUserById(db, userId);
+    if(user.role === 'admin'){
+      const data = await organizationModel.getAllOrganizations(db);
+      return res.status(200).json({
+        success: true,
+        count: data.length,
+        data: data
+      });
+    } 
     const organizations = await organizationModel.findOrganizationsByUserId(db, userId);
-    
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
       count: organizations.length,
       data: organizations
